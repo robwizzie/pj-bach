@@ -296,11 +296,12 @@
     const trip = tripById(id); currentTripId = id; markOpened(id); updateNav();
     const body = $("#modal-body"); body.innerHTML = "";
 
-    const hero = document.createElement("div"); hero.className = "trip-hero";
+    const hero = document.createElement("div"); hero.className = "trip-hero zoomable";
     hero.appendChild(imageSlot(trip.hero, trip.name + " hero shot"));
     const ov = document.createElement("div"); ov.className = "trip-hero-overlay";
     ov.innerHTML = '<span class="th-door">Door ' + trip.door + '</span><h2>' + trip.emoji + " " + trip.name + '</h2><div class="tag">' + trip.tagline + '</div>';
     hero.appendChild(ov); body.appendChild(hero);
+    hero.onclick = () => openLightbox(trip, 0);
 
     const wrap = document.createElement("div"); wrap.className = "trip-body";
     const chips = Object.keys(trip.vibe).filter((k) => trip.vibe[k] >= 4)
@@ -331,10 +332,15 @@
     why.innerHTML = '<img src="images/pj-face.png" alt="PJ" onerror="this.style.display=\'none\'"><div><h4>Why PJ will love it</h4><p>' + trip.why + '</p></div>';
     wrap.appendChild(why);
 
-    const gt = document.createElement("h4"); gt.className = "gallery-title"; gt.textContent = "📸 How it'd actually go down";
+    const gt = document.createElement("h4"); gt.className = "gallery-title"; gt.textContent = "📸 How it'd actually go down (tap to expand)";
     wrap.appendChild(gt);
     const gal = document.createElement("div"); gal.className = "gallery";
-    trip.gallery.forEach((g, i) => gal.appendChild(imageSlot(g, trip.name + " pic " + (i + 1))));
+    trip.gallery.forEach((g, i) => {
+      const slot = imageSlot(g, trip.name + " pic " + (i + 1));
+      slot.classList.add("zoomable");
+      slot.onclick = () => openLightbox(trip, i + 1);
+      gal.appendChild(slot);
+    });
     wrap.appendChild(gal);
 
     const actions = document.createElement("div"); actions.className = "modal-actions";
@@ -360,6 +366,31 @@
     const sh = trip.costs.shared.map((c) => '<li><span>' + c.label + ' <i>(split ' + n + ')</i></span><b>' + money(c.lo / n) + " – " + money(c.hi / n) + '</b></li>').join("");
     return pp + sh;
   }
+  /* ---------- Lightbox (expand + per-trip carousel) ---------- */
+  let lbList = [], lbIndex = 0, lbName = "";
+  function openLightbox(trip, idx) {
+    lbList = [trip.hero].concat(trip.gallery);
+    lbName = trip.emoji + " " + trip.name;
+    lbIndex = idx || 0;
+    lbRender();
+    $("#lightbox").classList.remove("hidden");
+  }
+  function lbRender() {
+    const it = lbList[lbIndex];
+    const img = $("#lb-img");
+    img.classList.remove("loaded");
+    img.onload = () => img.classList.add("loaded");
+    img.onerror = () => img.classList.add("loaded");
+    img.src = it.img; img.alt = lbName;
+    $("#lb-cap").textContent = lbName + " — " + (lbIndex === 0 ? "the vibe" : "moment " + lbIndex);
+    $("#lb-counter").textContent = (lbIndex + 1) + " / " + lbList.length;
+    const multi = lbList.length > 1;
+    $("#lb-prev").style.display = multi ? "" : "none";
+    $("#lb-next").style.display = multi ? "" : "none";
+  }
+  function lbNav(dir) { if (!lbList.length) return; lbIndex = (lbIndex + dir + lbList.length) % lbList.length; sfx.click(); lbRender(); }
+  function closeLightbox() { $("#lightbox").classList.add("hidden"); }
+
   const rd = (icon, label, text) => '<div class="rd-item"><span class="rd-ic">' + icon + '</span><div class="rd-txt"><b>' + label + '</b><p>' + text + '</p></div></div>';
   function closeModal() { $("#modal-overlay").classList.add("hidden"); currentTripId = null; }
 
@@ -519,6 +550,17 @@
 
   $("#showdown-close").addEventListener("click", closeShowdown);
 
+  $("#lb-close").addEventListener("click", closeLightbox);
+  $("#lb-prev").addEventListener("click", () => lbNav(-1));
+  $("#lb-next").addEventListener("click", () => lbNav(1));
+  $("#lightbox").addEventListener("click", (e) => { if (e.target.id === "lightbox" || e.target.id === "lb-img") closeLightbox(); });
+  (function () {
+    let tx = null;
+    const lb = $("#lightbox");
+    lb.addEventListener("touchstart", (e) => { tx = e.changedTouches[0].clientX; }, { passive: true });
+    lb.addEventListener("touchend", (e) => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 45) lbNav(dx < 0 ? 1 : -1); tx = null; }, { passive: true });
+  })();
+
   $("#finale-back").addEventListener("click", () => { lockedId = null; save(); closeFinale(); renderDoors(); showScreen("stage"); });
   $("#finale-restart").addEventListener("click", () => askConfirm("Wipe everything and play the whole game again from scratch?", fullReset));
   $("#finale-print").addEventListener("click", () => window.print());
@@ -535,6 +577,13 @@
   $("#confirm-overlay").addEventListener("click", (e) => { if (e.target.id === "confirm-overlay") closeConfirm(false); });
 
   document.addEventListener("keydown", (e) => {
+    // Lightbox takes priority when open
+    if (!$("#lightbox").classList.contains("hidden")) {
+      if (e.key === "Escape") return closeLightbox();
+      if (e.key === "ArrowLeft") return lbNav(-1);
+      if (e.key === "ArrowRight") return lbNav(1);
+      return;
+    }
     if (e.key === "Escape") {
       if (!$("#confirm-overlay").classList.contains("hidden")) return closeConfirm(false);
       if (!$("#countdown-overlay").classList.contains("hidden")) return;
