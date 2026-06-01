@@ -42,9 +42,9 @@
     <p class="show-byline">A game show where <b>YOU</b>, PJ, pick the trip. 🎤</p>
     <div class="host-bubble" id="host-bubble">
       Ladies and gentlemen… the man of the hour, <b>PJ!</b> 👏 Behind these
-      <b>6 mystery doors</b> are 6 legendary bachelor trips. Open one… then
-      <b>keep it</b>, <b>trade it</b>, or <b>keep peeking</b>. When you find
-      THE ONE — <b>lock it in!</b> 🎰
+      <b>6 mystery doors</b> are 6 legendary bachelor trips. Peek behind as
+      many as you want — each one has real prices and the deal on getting
+      there from Jersey. When you find THE ONE — <b>lock it in!</b> 🎰
     </div>
     <div class="intro-buttons">
       <button class="cta" id="start-btn">Let's Play! 🚪✨</button>
@@ -54,8 +54,8 @@
     <details class="how-to">
       <summary>How to play (30 sec) ▾</summary>
       <ol>
-        <li><b>Open a door</b> — tap any door to reveal a trip with prices, where you'd stay, food, drinks, and the vibe.</li>
-        <li><b>Flip around</b> — use ◀ ▶ inside a trip to browse the others, or hit <b>Trade</b> to let fate pick one for you.</li>
+        <li><b>Open a door</b> — tap any door to reveal a trip with real prices, how to get there from South Jersey, where you'd stay, food, drinks, and the vibe.</li>
+        <li><b>Flip around</b> — use ◀ ▶ to jump between doors you've already opened, or hit <b>🎲 Dealer's choice</b> to open a random one.</li>
         <li><b>Lock it in</b> when you find your trip — cue the confetti. 🎉</li>
         <li>Change your mind anytime: <b>Restart</b> (top right) wipes the slate clean.</li>
       </ol>
@@ -67,9 +67,10 @@
   <!-- ===== The doors stage ===== -->
   <main id="stage" class="stage screen hidden">
     <h2 class="stage-heading">Pick a door, PJ 👇</h2>
-    <p class="stage-tip" id="host-line">Tap a door to reveal the trip. Don't love it? Trade it or keep looking.</p>
+    <p class="stage-tip" id="host-line">Tap a door to reveal the trip behind it. Peek at as many as you want before you pick.</p>
     <div class="doors" id="doors"><!-- doors injected by JS --></div>
     <div class="stage-tools">
+      <button class="cta-ghost" id="dealer-btn">🎲 Dealer's choice</button>
       <button class="cta-ghost" id="stage-seeall">📋 See all 6 side by side</button>
     </div>
     <div class="locked-banner hidden" id="locked-banner"></div>
@@ -123,10 +124,6 @@
       </div>
     </div>
   </div>
-
-  <footer class="site-footer">
-    <p>Made with way too much hype for PJ's last ride as a free man. 🥂</p>
-  </footer>
 
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
