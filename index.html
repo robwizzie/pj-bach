@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="icon" href="images/pj-face.png" />
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="apple-touch-icon" href="images/favicon.png" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -85,13 +86,12 @@
   <!-- ===== Compare / browse-all view ===== -->
   <section id="compare" class="compare screen hidden">
     <h2 class="stage-heading">All 6 trips 📋</h2>
-    <p class="stage-tip">Compare side by side, set your crew size, vote 👍, then lock one in.</p>
+    <p class="stage-tip">Compare side by side, vote 👍, then lock one in. Prices are per person for our crew of 10 (PJ's covered 🍻).</p>
     <div class="compare-toolbar">
       <div class="seg" id="view-toggle">
         <button class="seg-btn is-active" data-view="cards">🃏 Cards</button>
         <button class="seg-btn" data-view="table">📊 Table</button>
       </div>
-      <div id="group-control-compare"></div>
     </div>
     <div class="compare-grid" id="compare-grid"><!-- cards injected by JS --></div>
     <div class="compare-table-wrap hidden" id="compare-table-wrap"><!-- table injected by JS --></div>
@@ -134,7 +134,7 @@
       <button class="sheet-close" id="decide-close" title="Close">✕</button>
       <h3>🧭 Help PJ decide</h3>
       <p class="sheet-sub">Answer 3 quick things and I'll spotlight the best-fit trips on the board.</p>
-      <label class="field">
+      <label class="field budget-field">
         <span>Max budget per person: <b id="budget-val">$1,200</b></span>
         <input type="range" id="budget-range" min="400" max="1600" step="50" value="1200" />
       </label>

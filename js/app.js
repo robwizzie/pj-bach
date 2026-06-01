@@ -11,7 +11,7 @@
   const opened = new Set();
   let lockedId = null;
   let soundOn = true;
-  let groupSize = DEFAULT_GROUP;
+  const groupSize = DEFAULT_GROUP; // 10 paying — there are 11 of us but PJ's covered 🍻
   let votes = {};
   let currentTripId = null;
   let activeFilter = null;     // { matchIds:Set, topId, summary }
@@ -26,7 +26,7 @@
   /* ---------- Persistence ---------- */
   const SAVE_KEY = "pj-bach-state";
   function save() {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({ opened: [...opened], lockedId, soundOn, groupSize, votes }));
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ opened: [...opened], lockedId, soundOn, votes }));
   }
   function load() {
     try {
@@ -34,7 +34,6 @@
       (s.opened || []).forEach((id) => opened.add(id));
       lockedId = s.lockedId || null;
       if (typeof s.soundOn === "boolean") soundOn = s.soundOn;
-      if (s.groupSize) groupSize = Math.min(MAX_GROUP, Math.max(MIN_GROUP, s.groupSize));
       if (s.votes) votes = s.votes;
     } catch (e) {}
   }
@@ -133,26 +132,6 @@
   }
   const randCatch = () => CATCHPHRASES[(Math.random() * CATCHPHRASES.length) | 0];
 
-  /* ---------- Group-size control ---------- */
-  function makeGroupControl(mount) {
-    mount.innerHTML =
-      '<div class="group-control">' +
-        '<label>👥 Crew size: <b class="group-val">' + groupSize + '</b> guys</label>' +
-        '<input type="range" class="group-range" min="' + MIN_GROUP + '" max="' + MAX_GROUP + '" value="' + groupSize + '">' +
-        '<span class="group-hint">More guys split the house = cheaper each 📉</span>' +
-      '</div>';
-    const range = mount.querySelector(".group-range");
-    range.addEventListener("input", () => applyGroupSize(+range.value));
-  }
-  function applyGroupSize(n) {
-    groupSize = n; save();
-    $$(".group-val").forEach((e) => (e.textContent = n));
-    $$("input.group-range").forEach((e) => { if (+e.value !== n) e.value = n; });
-    renderDoors();
-    if (!$("#compare").classList.contains("hidden")) { renderCompareCards(); renderTable(); }
-    if (!$("#modal-overlay").classList.contains("hidden") && currentTripId) refreshModalCosts(currentTripId);
-  }
-
   /* ---------- Doors ---------- */
   function renderDoors() {
     const wrap = $("#doors");
@@ -244,7 +223,7 @@
   }
 
   /* ---------- Compare: cards + table ---------- */
-  function renderCompare() { makeGroupControl($("#group-control-compare")); renderCompareCards(); renderTable(); }
+  function renderCompare() { renderCompareCards(); renderTable(); }
 
   function renderCompareCards() {
     const grid = $("#compare-grid"); grid.innerHTML = "";
@@ -333,10 +312,9 @@
         '<span class="pm-note">' + trip.priceNote + '</span></div>' + (chips ? '<div class="chips">' + chips + '</div>' : "") + '</div>' +
       (travel.badge ? '<div class="travel-badge ' + (travel.drivable ? "is-drive" : "is-fly") + '">' + travel.badge + '</div>' : "") +
       '<details class="cost-box" open><summary>💰 Where the money goes <span class="cb-tag">per person</span></summary>' +
-        '<div id="modal-group"></div>' +
         '<ul class="cost-list" id="m-costlist">' + costRowsHTML(trip, groupSize) + '</ul>' +
         '<div class="cost-total"><span>Estimated total each</span><b id="m-total">' + costRange(trip, groupSize) + '</b></div>' +
-        '<p class="cost-foot">Ballpark estimates — flights are book-early fares from Philly (PHL). The house/condo splits across the crew, so drag the slider to see your real share. Confirm before booking.</p>' +
+        '<p class="cost-foot">Ballpark per person, split across the <b>10 of us paying</b> (PJ\'s covered 🍻). Flights are book-early fares from Philly (PHL) — always confirm before booking.</p>' +
       '</details>' +
       '<div class="rundown">' +
         rd("🏨", "Where we stay", trip.stay) + rd("🍔", "Food", trip.food) + rd("🍻", "Drinks & bars", trip.drinks) +
@@ -370,7 +348,6 @@
     actions.querySelector(".btn-vote").onclick = () => vote(id);
     actions.querySelector(".btn-secondary").onclick = closeModal;
 
-    makeGroupControl($("#modal-group"));
     requestAnimationFrame(() => requestAnimationFrame(() => {
       body.querySelectorAll(".vibe-fill").forEach((f) => (f.style.width = f.dataset.pct + "%"));
     }));
@@ -382,12 +359,6 @@
     const pp = trip.costs.perPerson.map((c) => '<li><span>' + c.label + '</span><b>' + money(c.lo) + " – " + money(c.hi) + '</b></li>').join("");
     const sh = trip.costs.shared.map((c) => '<li><span>' + c.label + ' <i>(split ' + n + ')</i></span><b>' + money(c.lo / n) + " – " + money(c.hi / n) + '</b></li>').join("");
     return pp + sh;
-  }
-  function refreshModalCosts(id) {
-    const trip = tripById(id);
-    const list = $("#m-costlist"); if (list) list.innerHTML = costRowsHTML(trip, groupSize);
-    const tot = $("#m-total"); if (tot) tot.textContent = costRange(trip, groupSize);
-    const amt = $("#modal-body .pm-amt"); if (amt) amt.textContent = costRange(trip, groupSize);
   }
   const rd = (icon, label, text) => '<div class="rd-item"><span class="rd-ic">' + icon + '</span><div class="rd-txt"><b>' + label + '</b><p>' + text + '</p></div></div>';
   function closeModal() { $("#modal-overlay").classList.add("hidden"); currentTripId = null; }
@@ -408,7 +379,12 @@
   function dealersChoice() {
     const un = TRIPS.filter((t) => !opened.has(t.id));
     const pool = un.length ? un : TRIPS;
-    sfx.open(); openModal(pool[(Math.random() * pool.length) | 0].id);
+    const pick = pool[(Math.random() * pool.length) | 0];
+    const door = document.querySelector('.door[data-id="' + pick.id + '"]');
+    const face = door ? door.querySelector(".door-face") : null;
+    // Reveal exactly like tapping the door itself (countdown + swing on first open)
+    if (door && face) onDoorClick(pick.id, face, door);
+    else { sfx.click(); openModal(pick.id); }
   }
 
   /* ---------- Lock in → finale ---------- */

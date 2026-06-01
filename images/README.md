@@ -24,6 +24,16 @@ looks intentional. Drop a file with the exact name and it appears instantly.
 > the site, and lives in `js/data.js` under each trip's `prompt` field — tweak
 > them however you like.
 
+## 📐 Sizes so images fit perfectly (no stretching)
+Every slot uses `object-fit: cover`, so images are **center-cropped to fill** —
+they never stretch or distort, but the edges may be trimmed. For best results,
+keep the important stuff (PJ!) near the center and use these shapes:
+
+- **Hero images** (`*-hero.png`): wide / landscape — **1600 × 900** (16:9) is ideal.
+- **Gallery images** (`*-1/2/3.png`): square — **1000 × 1000** works great.
+- **`pj-face.png` / favicon**: already handled — the round logo and the favicon
+  (`favicon.png`) are generated to fit without stretching.
+
 **Tip for the funny AI pics:** upload the `pj-face.png` to your image generator
 and ask it to put PJ's face on the character described in each prompt. Keep the
 style consistent ("cartoon-realistic") so the whole site feels like one bit.
