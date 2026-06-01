@@ -52,11 +52,11 @@ const TRIPS = [
     nightlife: "Top-tier. This is the nightlife heavyweight of the list.",
     why: "PJ gets the full package — world-class beach by day, legendary bars and clubs by night, and food that'll ruin every other city for him.",
     vibe: { Beach: 5, Nightlife: 5, Billiards: 3, Food: 5, Chill: 2 },
-    hero: { img: "images/miami-hero.png", prompt: "PJ's cartoon face photoshopped onto a guy in sunglasses lounging on a flamingo float in the South Beach surf, neon Art-Deco hotels behind, golden hour, hyper-real" },
+    hero: { img: "images/miami-hero.jpg", prompt: "PJ's cartoon face photoshopped onto a guy in sunglasses lounging on a flamingo float in the South Beach surf, neon Art-Deco hotels behind, golden hour, hyper-real" },
     gallery: [
-      { img: "images/miami-1.png", prompt: "PJ riding a jet ski past the Miami skyline, way too confident, action movie poster style" },
-      { img: "images/miami-2.png", prompt: "PJ in a white linen suit ordering a giant tower of stone crab, Cuban restaurant, laughing" },
-      { img: "images/miami-3.png", prompt: "PJ on a glowing nightclub dance floor surrounded by confetti, disco lights, having the time of his life" }
+      { img: "images/miami-1.jpg", prompt: "PJ riding a jet ski past the Miami skyline, way too confident, action movie poster style" },
+      { img: "images/miami-2.jpg", prompt: "PJ in a white linen suit ordering a giant tower of stone crab, Cuban restaurant, laughing" },
+      { img: "images/miami-3.jpg", prompt: "PJ on a glowing nightclub dance floor surrounded by confetti, disco lights, having the time of his life" }
     ]
   },
   {
@@ -90,11 +90,11 @@ const TRIPS = [
     nightlife: "Floating party — nightclub, live music, casino, and a deck party under the stars.",
     why: "Food and entertainment are included once you're aboard — beach, buffets, casino, and nightlife all in one. Just remember the flights to Florida are the real cost here, not the cruise itself.",
     vibe: { Beach: 4, Nightlife: 4, Billiards: 3, Food: 5, Chill: 5 },
-    hero: { img: "images/cruise-hero.png", prompt: "PJ as the captain of a massive cruise ship steering with one hand and holding a tropical drink, crew saluting, sunny ocean, cartoon-realistic" },
+    hero: { img: "images/cruise-hero.jpg", prompt: "PJ as the captain of a massive cruise ship steering with one hand and holding a tropical drink, crew saluting, sunny ocean, cartoon-realistic" },
     gallery: [
-      { img: "images/cruise-1.png", prompt: "PJ winning big at the ship's casino, chips flying everywhere, tuxedo, James Bond pose" },
-      { img: "images/cruise-2.png", prompt: "PJ on a private island hammock between two palm trees, turquoise water, fruity drink, total bliss" },
-      { img: "images/cruise-3.png", prompt: "PJ at the all-you-can-eat buffet with a plate stacked to the ceiling, eyes wide with joy" }
+      { img: "images/cruise-1.jpg", prompt: "PJ winning big at the ship's casino, chips flying everywhere, tuxedo, James Bond pose" },
+      { img: "images/cruise-2.jpg", prompt: "PJ on a private island hammock between two palm trees, turquoise water, fruity drink, total bliss" },
+      { img: "images/cruise-3.jpg", prompt: "PJ at the all-you-can-eat buffet with a plate stacked to the ceiling, eyes wide with joy" }
     ]
   },
   {
@@ -128,11 +128,11 @@ const TRIPS = [
     nightlife: "Wild, walkable, and non-stop — Duval Street is one big party from sunset on.",
     why: "The most quintessentially 'bachelor' island vibe — walk everywhere, drink everywhere, and the whole crew stays together with zero planning.",
     vibe: { Beach: 4, Nightlife: 5, Billiards: 3, Food: 4, Chill: 4 },
-    hero: { img: "images/keywest-hero.png", prompt: "PJ at the Key West southernmost-point buoy wearing a captain's hat and floral shirt, holding a key lime pie, sunset, cartoon-realistic" },
+    hero: { img: "images/keywest-hero.jpg", prompt: "PJ at the Key West southernmost-point buoy wearing a captain's hat and floral shirt, holding a key lime pie, sunset, cartoon-realistic" },
     gallery: [
-      { img: "images/keywest-1.png", prompt: "PJ leading a conga line of buddies down Duval Street at night, neon bar signs, chaos and joy" },
-      { img: "images/keywest-2.png", prompt: "PJ snorkeling and shaking hands with a friendly fish, crystal reef water, comically calm" },
-      { img: "images/keywest-3.png", prompt: "PJ at sunset on Mallory Square toasting with a giant tropical drink, street performers behind" }
+      { img: "images/keywest-1.jpg", prompt: "PJ leading a conga line of buddies down Duval Street at night, neon bar signs, chaos and joy" },
+      { img: "images/keywest-2.jpg", prompt: "PJ snorkeling and shaking hands with a friendly fish, crystal reef water, comically calm" },
+      { img: "images/keywest-3.jpg", prompt: "PJ at sunset on Mallory Square toasting with a giant tropical drink, street performers behind" }
     ]
   },
   {
@@ -165,11 +165,11 @@ const TRIPS = [
     nightlife: "More house-party / bonfire than club scene — relaxed, but the crew makes its own fun.",
     why: "The best bang-for-buck on the board and the easiest for a big group. Beach out front, pool table inside, everyone together — pure low-stress fun.",
     vibe: { Beach: 5, Nightlife: 2, Billiards: 5, Food: 4, Chill: 5 },
-    hero: { img: "images/obx-hero.png", prompt: "PJ grilling on the deck of a giant beach house in an apron that says 'Grill Sergeant', crew cheering, ocean behind, sunny, cartoon-realistic" },
+    hero: { img: "images/obx-hero.jpg", prompt: "PJ grilling on the deck of a giant beach house in an apron that says 'Grill Sergeant', crew cheering, ocean behind, sunny, cartoon-realistic" },
     gallery: [
-      { img: "images/obx-1.png", prompt: "PJ lining up a serious pool shot in a beach-house game room, sweatband on, tongue out in concentration" },
-      { img: "images/obx-2.png", prompt: "PJ riding a boogie board down a huge wave, total wipeout incoming, action shot" },
-      { img: "images/obx-3.png", prompt: "PJ in a hot tub at sunset surrounded by buddies and floating drinks, beach house glowing" }
+      { img: "images/obx-1.jpg", prompt: "PJ lining up a serious pool shot in a beach-house game room, sweatband on, tongue out in concentration" },
+      { img: "images/obx-2.jpg", prompt: "PJ riding a boogie board down a huge wave, total wipeout incoming, action shot" },
+      { img: "images/obx-3.jpg", prompt: "PJ in a hot tub at sunset surrounded by buddies and floating drinks, beach house glowing" }
     ]
   },
   {
@@ -202,11 +202,11 @@ const TRIPS = [
     nightlife: "Elite. Nashville is THE bachelor-party city for a reason — non-stop live music and bars.",
     why: "If the trip is really about bars, nightlife, and food with the crew, nothing beats Nashville. Walkable, legendary, and built for exactly this.",
     vibe: { Beach: 0, Nightlife: 5, Billiards: 4, Food: 5, Chill: 3 },
-    hero: { img: "images/nashville-hero.png", prompt: "PJ on a Nashville pedal tavern leading the crew down Broadway, cowboy hat, holding a beer, neon honky-tonk signs glowing, cartoon-realistic" },
+    hero: { img: "images/nashville-hero.jpg", prompt: "PJ on a Nashville pedal tavern leading the crew down Broadway, cowboy hat, holding a beer, neon honky-tonk signs glowing, cartoon-realistic" },
     gallery: [
-      { img: "images/nashville-1.png", prompt: "PJ on stage at a honky-tonk grabbing the mic from the band, full cowboy outfit, crowd loving it" },
-      { img: "images/nashville-2.png", prompt: "PJ demolishing a giant plate of Nashville hot chicken, face on fire, sweating, thumbs up" },
-      { img: "images/nashville-3.png", prompt: "PJ riding a mechanical bull in a bar, one hand up rodeo-style, buddies cheering" }
+      { img: "images/nashville-1.jpg", prompt: "PJ on stage at a honky-tonk grabbing the mic from the band, full cowboy outfit, crowd loving it" },
+      { img: "images/nashville-2.jpg", prompt: "PJ demolishing a giant plate of Nashville hot chicken, face on fire, sweating, thumbs up" },
+      { img: "images/nashville-3.jpg", prompt: "PJ riding a mechanical bull in a bar, one hand up rodeo-style, buddies cheering" }
     ]
   },
   {
@@ -239,11 +239,11 @@ const TRIPS = [
     nightlife: "Good and affordable — bars, breweries, and a lively boardwalk scene.",
     why: "Beach AND nightlife AND billiards for the lowest price on the board — the option where everyone can afford to say yes. Optional golf day for the crew.",
     vibe: { Beach: 5, Nightlife: 4, Billiards: 4, Food: 3, Chill: 4 },
-    hero: { img: "images/myrtle-hero.png", prompt: "PJ teeing off on a beachfront golf course in loud golf pants while holding a beer, SkyWheel and ocean behind, cartoon-realistic" },
+    hero: { img: "images/myrtle-hero.jpg", prompt: "PJ teeing off on a beachfront golf course in loud golf pants while holding a beer, SkyWheel and ocean behind, cartoon-realistic" },
     gallery: [
-      { img: "images/myrtle-1.png", prompt: "PJ on the Myrtle Beach SkyWheel gondola flexing like he conquered it, ocean and boardwalk below" },
-      { img: "images/myrtle-2.png", prompt: "PJ at a seafood buffet with a mountain of crab legs, bib on, claws as trophies" },
-      { img: "images/myrtle-3.png", prompt: "PJ sinking the 8-ball at a beach bar arcade, crowd of buddies erupting behind him" }
+      { img: "images/myrtle-1.jpg", prompt: "PJ on the Myrtle Beach SkyWheel gondola flexing like he conquered it, ocean and boardwalk below" },
+      { img: "images/myrtle-2.jpg", prompt: "PJ at a seafood buffet with a mountain of crab legs, bib on, claws as trophies" },
+      { img: "images/myrtle-3.jpg", prompt: "PJ sinking the 8-ball at a beach bar arcade, crowd of buddies erupting behind him" }
     ]
   }
 ];
