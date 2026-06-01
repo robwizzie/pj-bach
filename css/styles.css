@@ -471,6 +471,8 @@ body {
   display: flex; flex-direction: column; gap: .3rem;
 }
 .compare-card.is-locked { outline: 3px solid var(--gold); }
+.compare-card { transition: transform .15s, box-shadow .15s; }
+.compare-card:hover { transform: translateY(-4px); box-shadow: 0 24px 52px rgba(0,0,0,.5); }
 .cc-top { display: flex; align-items: center; justify-content: space-between; }
 .cc-emoji { font-size: 1.8rem; }
 .cc-door { font-size: .75rem; font-weight: 700; opacity: .55; }
@@ -588,6 +590,7 @@ body {
 .t-name b { display: block; font-size: .95rem; }
 .t-name span { font-size: .76rem; opacity: .65; }
 .t-price { font-weight: 700; color: var(--gold-deep); white-space: nowrap; }
+.t-travel { white-space: nowrap; }
 .dots { letter-spacing: 2px; color: var(--gold-deep); font-size: .95rem; }
 .dots .o { color: #dcd3ea; }
 .t-pick { cursor: pointer; border: none; border-radius: 8px; padding: .45rem .8rem; font-family: "Fredoka", sans-serif; font-weight: 700; background: linear-gradient(180deg, var(--gold), var(--gold-deep)); color: var(--ink); }
@@ -651,7 +654,7 @@ body {
   background: radial-gradient(circle at 50% 0%, #4a106f, #12042a);
   display: flex; flex-direction: column; align-items: center; padding: 2.4rem 1rem;
 }
-.sd-title { font-family: "Bungee", cursive; color: var(--gold); font-size: clamp(1.6rem,6vw,2.8rem); text-shadow: 0 3px 0 var(--gold-deep); margin: .2rem 0; text-align: center; }
+.sd-title { font-family: "Bungee", cursive; color: var(--gold); font-size: clamp(1.3rem,6vw,2.8rem); text-shadow: 0 3px 0 var(--gold-deep); margin: .2rem auto; padding: 0 .6rem; max-width: 90%; text-align: center; overflow-wrap: anywhere; }
 .sd-progress { color: #fff; opacity: .9; margin: 0 0 1.6rem; text-align: center; font-weight: 600; }
 .sd-arena { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; max-width: 800px; width: 100%; }
 .sd-card {
