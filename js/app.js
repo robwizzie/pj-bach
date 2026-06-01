@@ -48,7 +48,7 @@
     trip.costs.shared.forEach((c) => { lo += c.lo / n; hi += c.hi / n; });
     return { lo, hi };
   }
-  const costRange = (trip, n) => { const c = tripCost(trip, n); return money(c.lo) + " – " + money(c.hi); };
+  const costRange = (trip, n) => { if (trip.free) return "FREE"; const c = tripCost(trip, n); return money(c.lo) + " – " + money(c.hi); };
 
   function showScreen(name) {
     ["intro", "stage", "compare"].forEach((s) => $("#" + s).classList.toggle("hidden", s !== name));
@@ -199,7 +199,7 @@
       if (d) { d.classList.add("is-open"); d.querySelector(".door-face").classList.add("open"); }
     }
   }
-  const updateCounter = () => ($("#opened-count").textContent = opened.size);
+  const updateCounter = () => { $("#opened-count").textContent = opened.size; const t = $("#total-doors"); if (t) t.textContent = TRIPS.length; };
   function updateHostLine() {
     const line = $("#host-line"); if (!line) return;
     if (lockedId) { line.innerHTML = "🔒 Locked in! Hit a door to keep browsing, or Restart to play again."; return; }
@@ -315,7 +315,9 @@
       '<details class="cost-box" open><summary>💰 Where the money goes <span class="cb-tag">per person</span></summary>' +
         '<ul class="cost-list" id="m-costlist">' + costRowsHTML(trip, groupSize) + '</ul>' +
         '<div class="cost-total"><span>Estimated total each</span><b id="m-total">' + costRange(trip, groupSize) + '</b></div>' +
-        '<p class="cost-foot">Ballpark per person, split across the <b>10 of us paying</b> (PJ\'s covered 🍻). Flights are book-early fares from Philly (PHL) — always confirm before booking.</p>' +
+        '<p class="cost-foot">' + (trip.free
+          ? "It's free. It's South Jersey. The only real cost is your dignity. 🦅🍺"
+          : "Ballpark per person, split across the <b>10 of us paying</b> (PJ's covered 🍻). Flights are book-early fares from Philly (PHL) — always confirm before booking.") + '</p>' +
       '</details>' +
       '<div class="rundown">' +
         rd("🏨", "Where we stay", trip.stay) + rd("🍔", "Food", trip.food) + rd("🍻", "Drinks & bars", trip.drinks) +

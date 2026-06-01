@@ -30,7 +30,7 @@
       </span>
     </button>
     <div class="topbar-controls">
-      <span class="counter" id="counter" title="Doors PJ has peeked behind">🚪 <b id="opened-count">0</b>/6 opened</span>
+      <span class="counter" id="counter" title="Doors PJ has peeked behind">🚪 <b id="opened-count">0</b>/<b id="total-doors">7</b> opened</span>
       <button class="pill-btn" id="seeall-btn"><span class="pi">📋</span><span class="pl">See all</span></button>
       <button class="pill-btn" id="mute-btn"><span class="pi">🔊</span><span class="pl">Sound</span></button>
       <button class="pill-btn" id="reset-btn"><span class="pi">↻</span><span class="pl">Restart</span></button>
@@ -46,13 +46,14 @@
     <p class="show-byline">A game show where <b>YOU</b>, PJ, pick the trip. 🎤</p>
     <div class="host-bubble" id="host-bubble">
       Ladies and gentlemen… the man of the hour, <b>PJ!</b> 👏 Behind these
-      <b>6 mystery doors</b> are 6 legendary bachelor trips. Peek behind as
+      <b>7 mystery doors</b> are 7 legendary bachelor trips (well… 6 legendary
+      ones and a wildcard 👀). Peek behind as
       many as you want — each one has real prices and the deal on getting
       there from Jersey. When you find THE ONE — <b>lock it in!</b> 🎰
     </div>
     <div class="intro-buttons">
       <button class="cta" id="start-btn">Let's Play! 🚪✨</button>
-      <button class="cta-ghost" id="browse-btn">Just show me all 6 options 📋</button>
+      <button class="cta-ghost" id="browse-btn">Just show me all 7 options 📋</button>
     </div>
 
     <details class="how-to">
@@ -78,14 +79,14 @@
       <button class="cta-ghost" id="dealer-btn">🎲 Dealer's choice</button>
       <button class="cta-ghost" id="decide-btn">🧭 Help me decide</button>
       <button class="cta-ghost" id="showdown-btn">⚔️ Trip showdown</button>
-      <button class="cta-ghost" id="stage-seeall">📋 See all 6</button>
+      <button class="cta-ghost" id="stage-seeall">📋 See all 7</button>
     </div>
     <div class="locked-banner hidden" id="locked-banner"></div>
   </main>
 
   <!-- ===== Compare / browse-all view ===== -->
   <section id="compare" class="compare screen hidden">
-    <h2 class="stage-heading">All 6 trips 📋</h2>
+    <h2 class="stage-heading">All 7 trips 📋</h2>
     <p class="stage-tip">Compare side by side, vote 👍, then lock one in. Prices are per person for our crew of 10 (PJ's covered 🍻).</p>
     <div class="compare-toolbar">
       <div class="seg" id="view-toggle">

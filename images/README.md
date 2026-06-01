@@ -19,6 +19,7 @@ looks intentional. Drop a file with the exact name and it appears instantly.
 | 4 Outer Banks | `obx-hero.jpg` | `obx-1.jpg` | `obx-2.jpg` | `obx-3.jpg` |
 | 5 Nashville | `nashville-hero.jpg` | `nashville-1.jpg` | `nashville-2.jpg` | `nashville-3.jpg` |
 | 6 Myrtle Beach | `myrtle-hero.jpg` | `myrtle-1.jpg` | `myrtle-2.jpg` | `myrtle-3.jpg` |
+| 7 South Jersey (meme) | `sj-hero.jpg` | `sj-wilsons.jpg` (Wilson's Pub pool bar) | `sj-picalilli.jpg` (Pic-A-Lilli Inn) | `sj-wildwood.jpg` (Wildwood) |
 
 > The exact AI-image prompt for each slot is shown right in the placeholder on
 > the site, and lives in `js/data.js` under each trip's `prompt` field — tweak
