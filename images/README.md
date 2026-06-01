@@ -13,12 +13,12 @@ looks intentional. Drop a file with the exact name and it appears instantly.
 
 | Door | Hero shot | Gallery 1 | Gallery 2 | Gallery 3 |
 |------|-----------|-----------|-----------|-----------|
-| 1 Miami | `miami-hero.png` | `miami-1.png` | `miami-2.png` | `miami-3.png` |
-| 2 Cruise | `cruise-hero.png` | `cruise-1.png` | `cruise-2.png` | `cruise-3.png` |
-| 3 Key West | `keywest-hero.png` | `keywest-1.png` | `keywest-2.png` | `keywest-3.png` |
-| 4 Outer Banks | `obx-hero.png` | `obx-1.png` | `obx-2.png` | `obx-3.png` |
-| 5 Nashville | `nashville-hero.png` | `nashville-1.png` | `nashville-2.png` | `nashville-3.png` |
-| 6 Myrtle Beach | `myrtle-hero.png` | `myrtle-1.png` | `myrtle-2.png` | `myrtle-3.png` |
+| 1 Miami | `miami-hero.jpg` | `miami-1.jpg` | `miami-2.jpg` | `miami-3.jpg` |
+| 2 Cruise | `cruise-hero.jpg` | `cruise-1.jpg` | `cruise-2.jpg` | `cruise-3.jpg` |
+| 3 Key West | `keywest-hero.jpg` | `keywest-1.jpg` | `keywest-2.jpg` | `keywest-3.jpg` |
+| 4 Outer Banks | `obx-hero.jpg` | `obx-1.jpg` | `obx-2.jpg` | `obx-3.jpg` |
+| 5 Nashville | `nashville-hero.jpg` | `nashville-1.jpg` | `nashville-2.jpg` | `nashville-3.jpg` |
+| 6 Myrtle Beach | `myrtle-hero.jpg` | `myrtle-1.jpg` | `myrtle-2.jpg` | `myrtle-3.jpg` |
 
 > The exact AI-image prompt for each slot is shown right in the placeholder on
 > the site, and lives in `js/data.js` under each trip's `prompt` field — tweak

@@ -376,10 +376,10 @@ body {
 }
 .btn-lock { background: linear-gradient(180deg, var(--gold), var(--gold-deep)); color: var(--ink); box-shadow: 0 5px 0 #b9760f; }
 .btn-trade { background: var(--teal); color: var(--ink); box-shadow: 0 5px 0 #128aa3; }
-.btn-secondary { background: #ece6f5; color: var(--ink); }
+.btn-secondary { background: #e3d9f3; color: var(--ink); box-shadow: 0 5px 0 #c1b2dd; }
 .btn-print { background: var(--pink); color: #fff; box-shadow: 0 5px 0 #b3245f; }
-.btn-lock:hover, .btn-trade:hover, .btn-print:hover { transform: translateY(-2px); filter: brightness(1.05); }
-.btn-lock:active, .btn-trade:active, .btn-print:active { transform: translateY(3px); }
+.btn-lock:hover, .btn-trade:hover, .btn-print:hover, .btn-secondary:hover, .btn-vote:hover { transform: translateY(-2px); filter: brightness(1.04); }
+.btn-lock:active, .btn-trade:active, .btn-print:active, .btn-secondary:active, .btn-vote:active { transform: translateY(3px); filter: brightness(1.02); }
 
 /* ---------- Image slots (placeholder system) ---------- */
 .image-slot {
