@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PJ's Bachelor Blowout — Behind the Doors!</title>
+  <meta name="description" content="Pick a door, trade a door, lock it in — PJ chooses his own bachelor adventure game-show style." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="images/pj-face.png" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- ===== Floating confetti canvas ===== -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- ===== Top bar ===== -->
+  <header class="topbar">
+    <div class="brand">
+      <img id="logo" class="logo" src="images/pj-face.png" alt="PJ" />
+      <div class="brand-text">
+        <span class="brand-title">PJ's Bachelor Blowout</span>
+        <span class="brand-sub">Behind the Doors 🎉</span>
+      </div>
+    </div>
+    <div class="topbar-controls">
+      <span class="counter" id="counter" title="Doors opened">🚪 <b id="opened-count">0</b>/6</span>
+      <button class="icon-btn" id="mute-btn" title="Toggle sound">🔊</button>
+      <button class="icon-btn" id="reset-btn" title="Start over">↻</button>
+    </div>
+  </header>
+
+  <!-- ===== Intro / Stage curtain ===== -->
+  <section id="intro" class="intro">
+    <div class="spotlight spotlight-l"></div>
+    <div class="spotlight spotlight-r"></div>
+    <img class="host-mascot" src="images/pj-face.png" alt="Host PJ" />
+    <h1 class="show-title">PJ'S BACHELOR<br><span>BLOWOUT</span></h1>
+    <p class="show-byline">A game show where <b>YOU</b>, PJ, pick the trip.</p>
+    <div class="host-bubble" id="host-bubble">
+      Welcome, PJ! Behind these <b>6 mystery doors</b> are 6 legendary bachelor trips.
+      Open one… then <b>keep it</b>, <b>trade it</b>, or <b>keep peeking</b>.
+      When you find THE ONE — <b>lock it in!</b> 🎰
+    </div>
+    <button class="cta" id="start-btn">Let's Play! 🚪✨</button>
+    <p class="brought-by">Brought to you by your (clearly superior) best men 🤝</p>
+  </section>
+
+  <!-- ===== The doors stage ===== -->
+  <main id="stage" class="stage hidden">
+    <h2 class="stage-heading">Pick a door, PJ 👇</h2>
+    <p class="stage-tip">Tap a door to reveal the trip. Don't love it? Trade it or keep looking.</p>
+    <div class="doors" id="doors"><!-- doors injected by JS --></div>
+    <div class="locked-banner hidden" id="locked-banner"></div>
+  </main>
+
+  <!-- ===== Trip reveal modal ===== -->
+  <div class="modal-overlay hidden" id="modal-overlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modal-close" title="Back to doors">✕</button>
+      <div id="modal-body"><!-- trip card injected by JS --></div>
+    </div>
+  </div>
+
+  <!-- ===== Winner / finale ===== -->
+  <div class="finale hidden" id="finale">
+    <div class="finale-inner">
+      <div class="winner-flash">🎉 WINNER! 🎉</div>
+      <img class="finale-stamp" src="images/pj-face.png" alt="PJ Approved" />
+      <h2 id="finale-title">PJ is going to…</h2>
+      <div id="finale-card"><!-- summary injected by JS --></div>
+      <div class="finale-actions">
+        <button class="btn-secondary" id="finale-back">Hmm, let me reconsider</button>
+        <button class="btn-print" id="finale-print">🖨️ Save / Share this pick</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>Made with way too much hype for PJ's last ride as a free man. 🥂</p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
