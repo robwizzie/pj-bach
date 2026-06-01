@@ -18,48 +18,82 @@
 
   <!-- ===== Top bar ===== -->
   <header class="topbar">
-    <div class="brand">
+    <button class="brand" id="home-btn" title="Back to start">
       <img id="logo" class="logo" src="images/pj-face.png" alt="PJ" />
-      <div class="brand-text">
+      <span class="brand-text">
         <span class="brand-title">PJ's Bachelor Blowout</span>
         <span class="brand-sub">Behind the Doors 🎉</span>
-      </div>
-    </div>
+      </span>
+    </button>
     <div class="topbar-controls">
-      <span class="counter" id="counter" title="Doors opened">🚪 <b id="opened-count">0</b>/6</span>
-      <button class="icon-btn" id="mute-btn" title="Toggle sound">🔊</button>
-      <button class="icon-btn" id="reset-btn" title="Start over">↻</button>
+      <span class="counter" id="counter" title="Doors PJ has peeked behind">🚪 <b id="opened-count">0</b>/6 opened</span>
+      <button class="pill-btn" id="seeall-btn"><span class="pi">📋</span><span class="pl">See all</span></button>
+      <button class="pill-btn" id="mute-btn"><span class="pi">🔊</span><span class="pl">Sound</span></button>
+      <button class="pill-btn" id="reset-btn"><span class="pi">↻</span><span class="pl">Restart</span></button>
     </div>
   </header>
 
   <!-- ===== Intro / Stage curtain ===== -->
-  <section id="intro" class="intro">
+  <section id="intro" class="intro screen">
     <div class="spotlight spotlight-l"></div>
     <div class="spotlight spotlight-r"></div>
     <img class="host-mascot" src="images/pj-face.png" alt="Host PJ" />
     <h1 class="show-title">PJ'S BACHELOR<br><span>BLOWOUT</span></h1>
-    <p class="show-byline">A game show where <b>YOU</b>, PJ, pick the trip.</p>
+    <p class="show-byline">A game show where <b>YOU</b>, PJ, pick the trip. 🎤</p>
     <div class="host-bubble" id="host-bubble">
-      Welcome, PJ! Behind these <b>6 mystery doors</b> are 6 legendary bachelor trips.
-      Open one… then <b>keep it</b>, <b>trade it</b>, or <b>keep peeking</b>.
-      When you find THE ONE — <b>lock it in!</b> 🎰
+      Ladies and gentlemen… the man of the hour, <b>PJ!</b> 👏 Behind these
+      <b>6 mystery doors</b> are 6 legendary bachelor trips. Open one… then
+      <b>keep it</b>, <b>trade it</b>, or <b>keep peeking</b>. When you find
+      THE ONE — <b>lock it in!</b> 🎰
     </div>
-    <button class="cta" id="start-btn">Let's Play! 🚪✨</button>
-    <p class="brought-by">Brought to you by your (clearly superior) best men 🤝</p>
+    <div class="intro-buttons">
+      <button class="cta" id="start-btn">Let's Play! 🚪✨</button>
+      <button class="cta-ghost" id="browse-btn">Just show me all 6 options 📋</button>
+    </div>
+
+    <details class="how-to">
+      <summary>How to play (30 sec) ▾</summary>
+      <ol>
+        <li><b>Open a door</b> — tap any door to reveal a trip with prices, where you'd stay, food, drinks, and the vibe.</li>
+        <li><b>Flip around</b> — use ◀ ▶ inside a trip to browse the others, or hit <b>Trade</b> to let fate pick one for you.</li>
+        <li><b>Lock it in</b> when you find your trip — cue the confetti. 🎉</li>
+        <li>Change your mind anytime: <b>Restart</b> (top right) wipes the slate clean.</li>
+      </ol>
+    </details>
+
+    <p class="brought-by">A gift from your two best men — this whole thing is about <b>you</b>, brother. 🤝🥂</p>
   </section>
 
   <!-- ===== The doors stage ===== -->
-  <main id="stage" class="stage hidden">
+  <main id="stage" class="stage screen hidden">
     <h2 class="stage-heading">Pick a door, PJ 👇</h2>
-    <p class="stage-tip">Tap a door to reveal the trip. Don't love it? Trade it or keep looking.</p>
+    <p class="stage-tip" id="host-line">Tap a door to reveal the trip. Don't love it? Trade it or keep looking.</p>
     <div class="doors" id="doors"><!-- doors injected by JS --></div>
+    <div class="stage-tools">
+      <button class="cta-ghost" id="stage-seeall">📋 See all 6 side by side</button>
+    </div>
     <div class="locked-banner hidden" id="locked-banner"></div>
   </main>
 
+  <!-- ===== Compare / browse-all view ===== -->
+  <section id="compare" class="compare screen hidden">
+    <h2 class="stage-heading">All 6 trips 📋</h2>
+    <p class="stage-tip">Tap any card for the full rundown — or lock one in right here.</p>
+    <div class="compare-grid" id="compare-grid"><!-- cards injected by JS --></div>
+    <div class="stage-tools">
+      <button class="cta-ghost" id="compare-back">⬅ Back to the doors</button>
+    </div>
+  </section>
+
   <!-- ===== Trip reveal modal ===== -->
-  <div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal-overlay hidden" id="modal-overlay" role="dialog" aria-modal="true" aria-label="Trip details">
     <div class="modal" id="modal">
-      <button class="modal-close" id="modal-close" title="Back to doors">✕</button>
+      <div class="modal-topnav">
+        <button class="nav-btn" id="prev-trip" title="Previous trip">◀</button>
+        <span class="nav-label" id="nav-label">Door 1 of 6</span>
+        <button class="nav-btn" id="next-trip" title="Next trip">▶</button>
+        <button class="modal-close" id="modal-close" title="Back to doors (Esc)">✕</button>
+      </div>
       <div id="modal-body"><!-- trip card injected by JS --></div>
     </div>
   </div>
@@ -72,8 +106,20 @@
       <h2 id="finale-title">PJ is going to…</h2>
       <div id="finale-card"><!-- summary injected by JS --></div>
       <div class="finale-actions">
-        <button class="btn-secondary" id="finale-back">Hmm, let me reconsider</button>
         <button class="btn-print" id="finale-print">🖨️ Save / Share this pick</button>
+        <button class="btn-secondary" id="finale-back">↩ Change my mind</button>
+        <button class="btn-secondary" id="finale-restart">↻ Play again from scratch</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Styled confirm dialog ===== -->
+  <div class="confirm-overlay hidden" id="confirm-overlay">
+    <div class="confirm-box">
+      <p id="confirm-text">Are you sure?</p>
+      <div class="confirm-actions">
+        <button class="btn-secondary" id="confirm-no">Never mind</button>
+        <button class="btn-lock" id="confirm-yes">Yes, do it</button>
       </div>
     </div>
   </div>
