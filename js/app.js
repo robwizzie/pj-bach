@@ -365,15 +365,8 @@
     const unopened = TRIPS.filter((t) => !opened.has(t.id));
     const pool = unopened.length ? unopened : TRIPS;
     const pick = pool[(Math.random() * pool.length) | 0];
-    const doorEl = document.querySelector('.door[data-id="' + pick.id + '"]');
-    if (doorEl) {
-      doorEl.scrollIntoView({ behavior: "smooth", block: "center" });
-      doorEl.classList.add("trade-flash");
-      doorEl.querySelector(".door-face").classList.add("open");
-      doorEl.classList.add("is-open");
-    }
-    sfx.open(); burst(40);
-    setTimeout(() => openModal(pick.id), 550);
+    sfx.open();
+    openModal(pick.id);
   }
 
   /* ---------- Lock in → finale ---------- */
