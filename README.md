@@ -21,10 +21,16 @@ It's a plain static site — no build step, no dependencies.
 1. PJ hits **Let's Play** and sees **6 mystery doors**.
 2. He opens a door → it swings open and reveals a trip card with price, lodging,
    food, drinks, billiards, beach, nightlife, a vibe-meter, and a funny AI-pic gallery.
-3. He can **Lock it in 😍**, **Trade 🔄** (reveals a random other door, game-show
-   style), or **Keep looking 👀**.
+   Each card shows real per-person costs, how to get there from **South Jersey**
+   (drive vs fly), where you'd stay, food, drinks, the vibe, and an honest
+   "real talk" catch.
+3. He can peek behind as many doors as he likes. Use **◀ ▶** to jump between
+   doors he's already opened, or **🎲 Dealer's choice** to open a random one.
+   Then **Lock it in 😍** or head **Back to doors 👀**.
 4. Locking in triggers a **confetti WINNER finale** with a printable/shareable
    summary and a "PJ Approved" stamp. His pick is remembered between visits.
+
+Closed doors tease the trip with a **sneak-peek emoji** hint (e.g. 🌴 🌃 🍹).
 
 ## ✏️ Editing trips & prices
 All trip content lives in **`js/data.js`** — edit text, prices, or the suggested

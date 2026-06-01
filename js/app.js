@@ -143,7 +143,8 @@
       face.innerHTML =
         '<div class="door-number">' + trip.door + '</div>' +
         '<div class="door-knob"></div>' +
-        '<div class="door-hint">Door #' + trip.door + '</div>';
+        (trip.peek ? '<div class="door-peek"><span class="dp-label">sneak peek</span><span class="dp-emoji">' + trip.peek + '</span></div>' : "") +
+        '<div class="door-hint">Tap to reveal</div>';
 
       door.appendChild(reveal);
       door.appendChild(face);
@@ -189,8 +190,8 @@
     if (!line) return;
     if (lockedId) { line.innerHTML = "🔒 Locked in! Hit a door to keep browsing, or Restart to play again."; return; }
     const n = opened.size;
-    if (n === 0) line.innerHTML = "Tap a door to reveal the trip. Don't love it? Trade it or keep looking.";
-    else if (n < TRIPS.length) line.innerHTML = "<b>" + n + "</b> door" + (n>1?"s":"") + " open — found your trip yet, PJ? Trade 🔄 or keep peeking 👀.";
+    if (n === 0) line.innerHTML = "Tap a door to reveal the trip behind it. Peek at as many as you want before you pick.";
+    else if (n < TRIPS.length) line.innerHTML = "<b>" + n + "</b> door" + (n>1?"s":"") + " open — found your trip yet, PJ? Keep peeking 👀 or lock one in.";
     else line.innerHTML = "You've seen all 6, PJ! 🔥 Time to <b>lock in your winner</b>.";
   }
 
@@ -257,16 +258,18 @@
       .map((b) => '<li><span>' + b.label + '</span><b>' + b.cost + '</b></li>')
       .join("");
 
+    const travel = trip.travel || {};
     wrap.innerHTML =
       '<div class="price-row">' +
         '<div class="price-main"><span class="pm-amt">' + trip.price + '</span>' +
         '<span class="pm-note">' + trip.priceNote + '</span></div>' +
         (chips ? '<div class="chips">' + chips + '</div>' : "") +
       '</div>' +
+      (travel.badge ? '<div class="travel-badge ' + (travel.drivable ? "is-drive" : "is-fly") + '">' + travel.badge + '</div>' : "") +
       '<details class="cost-box" open>' +
         '<summary>💰 Where the money goes <span class="cb-tag">est. per person</span></summary>' +
         '<ul class="cost-list">' + costRows + '</ul>' +
-        '<p class="cost-foot">Ballpark for a crew of ~10 — the more guys come, the cheaper it gets. Confirm before booking.</p>' +
+        '<p class="cost-foot">Ballpark for a crew of ~10 — the more guys come, the cheaper it gets. Flights are book-early estimates from Philly (PHL); always confirm before booking.</p>' +
       '</details>' +
       '<div class="rundown">' +
         rd("🏨", "Where we stay", trip.stay) +
@@ -275,7 +278,8 @@
         rd("🎱", "Billiards & activities", trip.billiards) +
         rd("🏖️", "Beach", trip.beach) +
         rd("🌃", "Nightlife", trip.nightlife) +
-      '</div>';
+      '</div>' +
+      (trip.catch ? '<div class="catch"><b>🤙 Real talk:</b> ' + trip.catch + '</div>' : "");
 
     const vibe = document.createElement("div");
     vibe.className = "vibe";
@@ -306,13 +310,11 @@
     actions.className = "modal-actions";
     actions.innerHTML =
       '<button class="btn-lock">😍 Lock in ' + trip.name + '</button>' +
-      '<button class="btn-trade">🔄 Trade — surprise me</button>' +
       '<button class="btn-secondary">👀 Back to doors</button>';
     wrap.appendChild(actions);
     body.appendChild(wrap);
 
     actions.querySelector(".btn-lock").onclick = () => lockIn(id);
-    actions.querySelector(".btn-trade").onclick = () => tradeDoor(id);
     actions.querySelector(".btn-secondary").onclick = closeModal;
 
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -358,22 +360,20 @@
     openModal(list[idx].id);
   }
 
-  /* ---------- Trade ---------- */
-  function tradeDoor(currentId) {
-    sfx.trade();
-    closeModal();
+  /* ---------- Dealer's choice: open a random un-opened door ---------- */
+  function dealersChoice() {
     const unopened = TRIPS.filter((t) => !opened.has(t.id));
-    const pool = unopened.length ? unopened : TRIPS.filter((t) => t.id !== currentId);
+    const pool = unopened.length ? unopened : TRIPS;
     const pick = pool[(Math.random() * pool.length) | 0];
-    setTimeout(() => {
-      const doorEl = document.querySelector('.door[data-id="' + pick.id + '"]');
-      if (doorEl) {
-        doorEl.scrollIntoView({ behavior: "smooth", block: "center" });
-        doorEl.classList.add("trade-flash");
-      }
-      sfx.open(); burst(40);
-      setTimeout(() => openModal(pick.id), 550);
-    }, 250);
+    const doorEl = document.querySelector('.door[data-id="' + pick.id + '"]');
+    if (doorEl) {
+      doorEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      doorEl.classList.add("trade-flash");
+      doorEl.querySelector(".door-face").classList.add("open");
+      doorEl.classList.add("is-open");
+    }
+    sfx.open(); burst(40);
+    setTimeout(() => openModal(pick.id), 550);
   }
 
   /* ---------- Lock in → finale ---------- */
@@ -405,6 +405,7 @@
       "<h3>" + trip.emoji + " " + trip.name + "</h3>" +
       "<p><b>" + trip.price + "</b> — <span style='opacity:.7'>" + trip.priceNote + "</span></p>" +
       "<ul>" +
+        (trip.travel && trip.travel.badge ? "<li>🧭 <b>Getting there:</b> " + trip.travel.badge + "</li>" : "") +
         "<li>🏨 <b>Stay:</b> " + trip.stay + "</li>" +
         "<li>🍔 <b>Food:</b> " + trip.food + "</li>" +
         "<li>🍻 <b>Drinks:</b> " + trip.drinks + "</li>" +
@@ -447,6 +448,7 @@
 
   $("#seeall-btn").addEventListener("click", () => { renderCompare(); showScreen("compare"); });
   $("#stage-seeall").addEventListener("click", () => { renderCompare(); showScreen("compare"); });
+  $("#dealer-btn").addEventListener("click", dealersChoice);
   $("#compare-back").addEventListener("click", () => showScreen("stage"));
 
   $("#modal-close").addEventListener("click", closeModal);
