@@ -369,7 +369,7 @@ body {
   display: flex; flex-wrap: wrap; gap: .7rem; margin-top: .2rem;
 }
 .modal-actions button { flex: 1 1 30%; min-width: 130px; }
-.btn-lock, .btn-trade, .btn-secondary, .btn-print {
+.btn-lock, .btn-trade, .btn-secondary, .btn-print, .btn-vote {
   font-family: "Fredoka", sans-serif; font-weight: 700;
   border: none; cursor: pointer; padding: .85rem 1rem;
   border-radius: 12px; font-size: 1rem; transition: transform .12s, filter .12s;
@@ -388,7 +388,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   overflow: hidden; border-radius: 12px;
 }
-.image-slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.image-slot img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
 .image-slot .ph {
   display: flex; flex-direction: column; gap: .35rem; align-items: center; justify-content: center;
   padding: .8rem; text-align: center; color: #6b5a82;
@@ -538,24 +538,10 @@ body {
 .host-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .host-toast img { width: 34px; height: 34px; border-radius: 50%; object-fit: contain; background: #fff; border: 2px solid var(--gold); }
 
-/* ---------- Group-size control ---------- */
-.group-control {
-  display: flex; flex-direction: column; gap: .35rem;
-  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
-  border-radius: 12px; padding: .6rem .9rem; min-width: 230px;
-}
-.group-control label { font-weight: 600; font-size: .92rem; }
-.group-control label b { color: var(--gold); font-size: 1.05rem; }
-.group-control .group-hint { font-size: .72rem; opacity: .7; }
-.group-range, #budget-range { -webkit-appearance: none; appearance: none; height: 8px; border-radius: 999px; background: rgba(255,255,255,.25); outline: none; }
-.group-range::-webkit-slider-thumb, #budget-range::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); border: 3px solid #fff; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
-.group-range::-moz-range-thumb, #budget-range::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--gold); border: 3px solid #fff; cursor: pointer; }
-/* group control inside the (light) modal cost box */
-.cost-box .group-control { background: #fff3d6; border: 1px solid var(--gold); margin: 0 .9rem .3rem; }
-.cost-box .group-control label { color: var(--ink); }
-.cost-box .group-control label b { color: var(--gold-deep); }
-.cost-box .group-control .group-hint { color: #7a5a1a; }
-.cost-box .group-range { background: #e7c98f; }
+/* ---------- Range slider (budget filter) ---------- */
+#budget-range { -webkit-appearance: none; appearance: none; width: 100%; height: 10px; border-radius: 999px; background: #efe7ff; outline: none; margin: .2rem 0; }
+#budget-range::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; background: var(--gold); border: 3px solid #fff; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,.35); }
+#budget-range::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: var(--gold); border: 3px solid #fff; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,.35); }
 
 /* ---------- Compare toolbar / segmented control ---------- */
 .compare-toolbar { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: center; margin-bottom: 1.4rem; }
@@ -643,10 +629,13 @@ body {
 .field { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1.1rem; font-weight: 600; }
 .field.check { flex-direction: row; align-items: center; gap: .6rem; }
 .field.check input { width: 20px; height: 20px; accent-color: var(--gold-deep); }
-.sheet .seg { background: #efe7ff; }
-.sheet .seg-btn { color: var(--ink); }
+.sheet .seg { background: #efe7ff; display: flex; width: 100%; }
+.sheet .seg-btn { flex: 1; text-align: center; color: var(--ink); padding: .6rem .5rem; }
 .sheet .seg-btn.is-active { background: var(--gold); color: var(--ink); }
-.sheet .cta { width: 100%; font-size: 1.1rem; padding: .85rem; }
+.field > span { display: block; }
+.budget-field { gap: .2rem; }
+.budget-field > span { margin-bottom: .3rem; }
+.sheet .cta { width: 100%; font-size: 1.1rem; padding: .9rem; margin-top: .3rem; }
 
 /* ---------- Showdown ---------- */
 .showdown {
