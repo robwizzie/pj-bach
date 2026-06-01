@@ -245,5 +245,43 @@ const TRIPS = [
       { img: "images/myrtle-2.jpg", prompt: "PJ at a seafood buffet with a mountain of crab legs, bib on, claws as trophies" },
       { img: "images/myrtle-3.jpg", prompt: "PJ sinking the 8-ball at a beach bar arcade, crowd of buddies erupting behind him" }
     ]
+  },
+  {
+    id: "southjersey",
+    door: 7,
+    name: "South Jersey",
+    emoji: "🦅",
+    tagline: "Why leave? It's all right here, baby.",
+    color: "#7cb342",
+    peek: "🍺 🎱 🎡",
+    free: true,
+    priceNote: "per person · however long you want · gloriously FREE",
+    travel: { drivable: true, short: "🚗 ~0 min", badge: "🚗 You're already here. Roll off the couch (~0–30 min). Zero flights, zero packing, zero excuses, zero dollars." },
+    catch: "Real talk: it's... South Jersey. The 'trip' is technically just a regular weekend. But the boys are together, the Wilson's pool table is open, and it costs absolutely nothing. Undefeated. 🏆",
+    nights: "as many as you can handle",
+    costs: {
+      free: true,
+      perPerson: [
+        { label: "🛋️ Lodging (your own bed)", lo: 0, hi: 0 },
+        { label: "🎱 Pool table at Wilson's Pub", lo: 0, hi: 0 },
+        { label: "🍺 Drinks (someone owes you anyway)", lo: 0, hi: 0 },
+        { label: "⛽ Gas (you're literally already here)", lo: 0, hi: 0 }
+      ],
+      shared: []
+    },
+    stay: "Your own bed. Or PJ's couch. Or the corner booth at Wilson's Pub if things get weird. Five-star familiarity for exactly $0.",
+    food: "Wawa hoagies, pork roll egg & cheese, and whatever's left in the fridge. Pizza if we're feeling fancy.",
+    drinks: "Wilson's Pub in Gibbstown, The Pic-A-Lilli Inn, and a cooler in the garage. The bartender already knows your order.",
+    billiards: "The pool table at Wilson's Pub — PJ's actual home turf. He has, allegedly, never lost on it. This is the real reason this door exists.",
+    beach: "Wildwood. Free beach, the boardwalk, Mack's pizza, and the tram car. 'Watch the tram car, please.'",
+    nightlife: "It's a Tuesday at Wilson's. It's everything PJ already knows and loves. Legendary in its own beautifully low-key way.",
+    why: "Because deep down, PJ's happiest with the boys, a cold one, and the Wilson's pool table under his command. No flights, no budget, no stress — just South Jersey doing what it does best. The people's champion. 🏆🦅",
+    vibe: { Beach: 3, Nightlife: 2, Billiards: 5, Food: 3, Chill: 5 },
+    hero: { img: "images/sj-hero.jpg", prompt: "MEME: PJ on his couch in a Wawa shirt holding a hoagie and a beer, TV remote in hand, looking like he just won the lottery, 'Welcome to South Jersey' road sign vibes (or drop a real funny pic here)" },
+    gallery: [
+      { img: "images/sj-wilsons.jpg", prompt: "Photo of the pool / billiards bar at Wilson's Pub in Gibbstown, NJ — PJ's home turf (drop a real pic here)" },
+      { img: "images/sj-picalilli.jpg", prompt: "Photo of The Pic-A-Lilli Inn dive bar in South Jersey (drop a real pic here)" },
+      { img: "images/sj-wildwood.jpg", prompt: "Photo of the Wildwood, NJ boardwalk and beach (drop a real pic here)" }
+    ]
   }
 ];
