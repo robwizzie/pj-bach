@@ -257,7 +257,7 @@
         '<h3 class="cc-name">' + trip.name + '</h3>' +
         '<p class="cc-tag">' + trip.tagline + '</p>' +
         '<p class="cc-price">' + costRange(trip, groupSize) + ' <span class="cc-per">/ person</span></p>' +
-        '<p class="cc-travel">' + (trip.travel.drivable ? "🚗 " : "✈️ ") + trip.travel.short + '</p>' +
+        '<p class="cc-travel">' + trip.travel.short + '</p>' +
         '<div class="cc-actions">' +
           '<button class="cc-details">Details</button>' +
           '<button class="vote-btn" title="Vote for this trip">👍 <b>' + (votes[trip.id] || 0) + '</b></button>' +
@@ -278,7 +278,7 @@
       '<tr data-id="' + trip.id + '"' + (lockedId === trip.id ? ' class="row-locked"' : "") + '>' +
         '<td class="t-name"><b>' + trip.emoji + " " + trip.name + '</b><span>' + trip.tagline + '</span></td>' +
         '<td class="t-price">' + costRange(trip, groupSize) + '</td>' +
-        '<td>' + (trip.travel.drivable ? "🚗 " : "✈️ ") + trip.travel.short + '</td>' +
+        '<td class="t-travel">' + trip.travel.short + '</td>' +
         '<td>' + trip.nights.replace(" at sea", "") + '</td>' +
         '<td>' + dots(trip.vibe.Beach) + '</td>' +
         '<td>' + dots(trip.vibe.Nightlife) + '</td>' +
@@ -291,7 +291,7 @@
         '<th>Trip</th><th>Price / person</th><th>Getting there</th><th>Nights</th>' +
         '<th>🏖️</th><th>🌃</th><th>🎱</th><th>Votes</th><th></th>' +
       '</tr></thead><tbody>' + rows + '</tbody></table>' +
-      '<p class="table-foot">Prices recalc with crew size above • 🏖️ beach · 🌃 nightlife · 🎱 billiards (out of 5)</p>';
+      '<p class="table-foot">Prices recalc with crew size above • 🏖️ beach · 🌃 nightlife · 🎱 billiards (out of 5) • swipe sideways on phones →</p>';
     wrap.querySelectorAll(".t-name, .t-price").forEach((c) => { c.style.cursor = "pointer"; c.onclick = () => openModal(c.parentElement.dataset.id); });
     wrap.querySelectorAll(".t-pick").forEach((b) => (b.onclick = () => lockIn(b.dataset.id)));
     wrap.querySelectorAll(".vote-btn").forEach((b) => (b.onclick = () => vote(b.dataset.id)));
