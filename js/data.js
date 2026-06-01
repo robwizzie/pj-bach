@@ -2,12 +2,23 @@
    PJ'S BACHELOR BLOWOUT — Trip Data
    -------------------------------------------------------------
    Everything that shows up behind the doors lives here.
-   To edit a trip: change the text below.
-   To add a photo: drop the file in /images and set the "img"
-   path on any slot. If the file is missing, the site shows a
-   labeled placeholder with the suggested AI-image prompt so it
-   still looks great. Add as many gallery images as you want.
+
+   COSTS MODEL (powers the live group-size slider + comparison table):
+   - costs.perPerson : costs that DON'T change with group size
+                       (flights, food, drinks, cruise fare, etc.)
+   - costs.shared    : whole-group TOTALS that get split across everyone
+                       (beach house, Airbnb, rental van, hotel rooms).
+   Per-person total at group size N =
+       sum(perPerson) + sum(shared) / N
+   Each line is { label, lo, hi } in dollars.
+
+   To add a photo: drop the file in /images and set the "img" path on
+   any slot. Missing files show a labeled placeholder with the AI prompt.
    ============================================================= */
+
+const DEFAULT_GROUP = 10;
+const MIN_GROUP = 6;
+const MAX_GROUP = 16;
 
 const TRIPS = [
   {
@@ -18,18 +29,21 @@ const TRIPS = [
     tagline: "South Beach, neon nights & Cuban food",
     color: "#ff4d9d",
     peek: "🌴 🌃 🍹",
-    price: "$950 – $1,450",
-    priceNote: "per person · 4 nights · all-in for a crew of ~10",
-    travel: { drivable: false, badge: "✈️ Fly from Philly (PHL) — ~3 hr nonstop. Way too far to drive (~18 hr from South Jersey)." },
+    priceNote: "per person · 4 nights · all-in",
+    travel: { drivable: false, short: "✈️ ~3 hr", badge: "✈️ Fly from Philly (PHL) — ~3 hr nonstop. Way too far to drive (~18 hr from South Jersey)." },
     catch: "Priciest nightlife on the board and Philly→Miami flights aren't cheap — but you get the full beach-by-day, clubs-by-night package.",
     nights: "4 nights",
-    breakdown: [
-      { label: "✈️ Flights (PHL → Miami, round-trip)", cost: "$200 – $450" },
-      { label: "🏨 South Beach stay (4 nts, split ~10)", cost: "$250 – $400" },
-      { label: "🍔 Food", cost: "$150 – $250" },
-      { label: "🍻 Bars, clubs & covers", cost: "$200 – $350" },
-      { label: "🚕 Rideshares & activities", cost: "$100 – $150" }
-    ],
+    costs: {
+      perPerson: [
+        { label: "✈️ Flights (PHL → Miami, round-trip)", lo: 200, hi: 450 },
+        { label: "🍔 Food", lo: 150, hi: 250 },
+        { label: "🍻 Bars, clubs & covers", lo: 200, hi: 350 },
+        { label: "🚕 Rideshares & activities", lo: 100, hi: 150 }
+      ],
+      shared: [
+        { label: "🏨 South Beach stay (4 nts)", lo: 2500, hi: 4000 }
+      ]
+    },
     stay: "South Beach Airbnb or a boutique Art-Deco hotel within walking distance of Ocean Drive — split a big place and the per-head cost drops fast.",
     food: "Cuban feasts at Versailles, fresh stone crab, late-night Latin brunches, and Wynwood food halls.",
     drinks: "Rooftop bars, beach clubs, Wynwood breweries, and a big night out in the South Beach club district.",
@@ -53,18 +67,21 @@ const TRIPS = [
     tagline: "All-inclusive party on the water",
     color: "#21c7e8",
     peek: "🚢 🎰 🏝️",
-    price: "$800 – $1,200",
-    priceNote: "per person · 4 nights · all-in incl. flights to the port",
-    travel: { drivable: false, badge: "✈️ Fly ~3 hr to a Florida port (Miami/Orlando) for a 4-night Bahamas sailing. 💡 Money-saver: drive just ~1½ hr to Cape Liberty in Bayonne, NJ and cruise from home with zero flights — but those sailings run longer (7+ nights)." },
+    priceNote: "per person · 4 nights · incl. flights to the port",
+    travel: { drivable: false, short: "✈️ to port", badge: "✈️ Fly ~3 hr to a Florida port (Miami/Orlando) for a 4-night Bahamas sailing. 💡 Money-saver: drive just ~1½ hr to Cape Liberty in Bayonne, NJ and cruise from home with zero flights — but those sailings run longer (7+ nights)." },
     catch: "You're on the ship's schedule, cabins are cozy (read: small), and the flights to Florida are the real cost — the cruise fare itself is the cheap part.",
     nights: "4 nights at sea",
-    breakdown: [
-      { label: "✈️ Flights to FL port (PHL → MCO/MIA, RT)", cost: "$180 – $400" },
-      { label: "🚢 Cruise cabin (4 nts, interior, dbl)", cost: "$350 – $500" },
-      { label: "💵 Gratuities + port taxes", cost: "$130 – $180" },
-      { label: "🍹 Drink package (optional, ~$80/day)", cost: "$0 – $320" },
-      { label: "🏨 Pre-cruise hotel night near port", cost: "$60 – $100" }
-    ],
+    costs: {
+      perPerson: [
+        { label: "✈️ Flights to FL port (PHL → MCO/MIA)", lo: 180, hi: 400 },
+        { label: "🚢 Cruise cabin (4 nts, interior, dbl)", lo: 350, hi: 500 },
+        { label: "💵 Gratuities + port taxes", lo: 130, hi: 180 },
+        { label: "🍹 Drink package (optional, ~$80/day)", lo: 0, hi: 320 }
+      ],
+      shared: [
+        { label: "🏨 Pre-cruise hotel night near port", lo: 600, hi: 1000 }
+      ]
+    },
     stay: "Cabins on a Royal Caribbean / Carnival ship — book a block of rooms together. Heads up: the cruise fare is cheap, but you still have to fly to the Florida port (and likely grab a hotel the night before sailing), so those are baked into the price above.",
     food: "Endless buffets, 24-hour pizza, steakhouse & sushi specialty nights — eat like kings, all included.",
     drinks: "Grab a drink package (≈ $80/day) and the bars never close. Onboard clubs, casino, and deck parties.",
@@ -88,18 +105,21 @@ const TRIPS = [
     tagline: "Duval Street crawl & island time",
     color: "#ffb020",
     peek: "🏝️ 🍹 🎣",
-    price: "$1,050 – $1,550",
     priceNote: "per person · 4 nights · the splurge island",
-    travel: { drivable: false, badge: "✈️ Fly to Miami (~3 hr from PHL) then a scenic 3½-hr drive down the Keys — or fly straight into Key West (EYW, pricier). Not drivable from NJ (~21 hr)." },
+    travel: { drivable: false, short: "✈️ + drive", badge: "✈️ Fly to Miami (~3 hr from PHL) then a scenic 3½-hr drive down the Keys — or fly straight into Key West (EYW, pricier). Not drivable from NJ (~21 hr)." },
     catch: "The most expensive option — it's a remote island, so both flights and lodging run high. Worth it for the all-walkable Duval party.",
     nights: "4 nights",
-    breakdown: [
-      { label: "✈️ Flights (PHL → Miami, RT) + Keys drive", cost: "$250 – $500" },
-      { label: "🚗 Rental van for the Keys drive (split)", cost: "$40 – $80" },
-      { label: "🏨 Old Town stay (4 nts, split ~10)", cost: "$350 – $550" },
-      { label: "🍤 Food", cost: "$200 – $300" },
-      { label: "🍻 Duval Street bar crawl", cost: "$200 – $300" }
-    ],
+    costs: {
+      perPerson: [
+        { label: "✈️ Flights (PHL → Miami, round-trip)", lo: 250, hi: 500 },
+        { label: "🍤 Food", lo: 200, hi: 300 },
+        { label: "🍻 Duval Street bar crawl", lo: 200, hi: 300 }
+      ],
+      shared: [
+        { label: "🏨 Old Town stay (4 nts)", lo: 3500, hi: 5500 },
+        { label: "🚗 Rental van for the Keys drive", lo: 400, hi: 800 }
+      ]
+    },
     stay: "An Old Town guesthouse or Airbnb steps from Duval Street — roll out of bed and into the action.",
     food: "Fresh-off-the-boat seafood, conch fritters, Cuban mix sandwiches, and the original Key lime pie.",
     drinks: "The legendary Duval Street bar crawl — Sloppy Joe's, Hog's Breath, Captain Tony's. A bachelor rite of passage.",
@@ -123,17 +143,20 @@ const TRIPS = [
     tagline: "Giant beach house & a game room",
     color: "#2ecc71",
     peek: "🏖️ 🎱 🔥",
-    price: "$500 – $750",
-    priceNote: "per person · 5 nights · best value on the board",
-    travel: { drivable: true, badge: "🚗 Totally drivable! ~6½ hr straight down from South Jersey. Pile into a couple cars — no airport, no flights, no baggage fees." },
+    priceNote: "per person · 5 nights · best value",
+    travel: { drivable: true, short: "🚗 ~6½ hr", badge: "🚗 Totally drivable! ~6½ hr straight down from South Jersey. Pile into a couple cars — no airport, no flights, no baggage fees." },
     catch: "Nightlife is house-party and bonfire vibes, not a club scene. If PJ wants wild bars every night, this isn't the one.",
     nights: "5 nights",
-    breakdown: [
-      { label: "🚗 Gas & tolls (your share of the drive)", cost: "$30 – $55" },
-      { label: "🏖️ Beach house (5 nts, split ~10)", cost: "$250 – $400" },
-      { label: "🍔 Groceries & cookouts", cost: "$100 – $150" },
-      { label: "🍻 Drinks & breweries", cost: "$80 – $150" }
-    ],
+    costs: {
+      perPerson: [
+        { label: "🚗 Gas & tolls (your share of the drive)", lo: 30, hi: 55 },
+        { label: "🍔 Groceries & cookouts", lo: 100, hi: 150 },
+        { label: "🍻 Drinks & breweries", lo: 80, hi: 150 }
+      ],
+      shared: [
+        { label: "🏖️ Beach house (5 nts)", lo: 2500, hi: 4000 }
+      ]
+    },
     stay: "A massive oceanfront beach house with a private pool, hot tub, AND a game room with its own pool table. Whole crew under one roof.",
     food: "Big group cookouts on the deck, fresh local seafood shacks, and a low-country boil one night.",
     drinks: "House party HQ — stock the fridge, plus local breweries and a few chill beach bars.",
@@ -157,17 +180,20 @@ const TRIPS = [
     tagline: "Broadway honky-tonks & hot chicken",
     color: "#a05cff",
     peek: "🤠 🎸 🍗",
-    price: "$750 – $1,100",
     priceNote: "per person · 3 nights · bachelor-party capital",
-    travel: { drivable: false, badge: "✈️ Fly from Philly (PHL) — ~2½ hr nonstop. It's a ~12-hr drive, so flying's the move." },
+    travel: { drivable: false, short: "✈️ ~2½ hr", badge: "✈️ Fly from Philly (PHL) — ~2½ hr nonstop. It's a ~12-hr drive, so flying's the move." },
     catch: "No beach and no ocean — this one's purely bars, live music, and food. If a beach is non-negotiable for PJ, skip it.",
     nights: "3 nights",
-    breakdown: [
-      { label: "✈️ Flights (PHL → Nashville, round-trip)", cost: "$160 – $400" },
-      { label: "🏨 Downtown Airbnb (3 nts, split ~10)", cost: "$150 – $250" },
-      { label: "🍗 Food", cost: "$120 – $180" },
-      { label: "🍻 Broadway bars + pedal tavern", cost: "$200 – $350" }
-    ],
+    costs: {
+      perPerson: [
+        { label: "✈️ Flights (PHL → Nashville, round-trip)", lo: 160, hi: 400 },
+        { label: "🍗 Food", lo: 120, hi: 180 },
+        { label: "🍻 Broadway bars + pedal tavern", lo: 200, hi: 350 }
+      ],
+      shared: [
+        { label: "🏨 Downtown Airbnb (3 nts)", lo: 1500, hi: 2500 }
+      ]
+    },
     stay: "A downtown Airbnb within stumbling distance of Broadway — the heart of the bachelor-party capital of America.",
     food: "Nashville hot chicken, smoked BBQ, and a boozy biscuit brunch to recover.",
     drinks: "Broadway's honky-tonks (live music on every floor), rooftop bars, and a pedal-tavern party on wheels.",
@@ -191,17 +217,20 @@ const TRIPS = [
     tagline: "Beach + nightlife on a budget",
     color: "#ff6a3d",
     peek: "⛱️ 🎢 ⛳",
-    price: "$450 – $700",
     priceNote: "per person · 4 nights · cheapest beach + nightlife",
-    travel: { drivable: true, badge: "🚗 Drivable in ~9 hr from South Jersey — or grab a cheap nonstop from Philly (PHL → MYR, often under $150 round-trip). Your call." },
+    travel: { drivable: true, short: "🚗 ~9 hr / ✈️", badge: "🚗 Drivable in ~9 hr from South Jersey — or grab a cheap nonstop from Philly (PHL → MYR, often under $150 round-trip). Your call." },
     catch: "A bit more low-key and family-friendly than Miami. The long drive (or a budget flight) is the trade-off for the lowest price here.",
     nights: "4 nights",
-    breakdown: [
-      { label: "🚗 Drive (gas share) — or ✈️ budget PHL→MYR flight", cost: "$40 – $250" },
-      { label: "🏨 Oceanfront condo (4 nts, split ~10)", cost: "$150 – $250" },
-      { label: "🍤 Food", cost: "$100 – $150" },
-      { label: "🍻 Bars & nightlife", cost: "$100 – $200" }
-    ],
+    costs: {
+      perPerson: [
+        { label: "🚗 Drive (gas) or ✈️ budget PHL→MYR flight", lo: 40, hi: 250 },
+        { label: "🍤 Food", lo: 100, hi: 150 },
+        { label: "🍻 Bars & nightlife", lo: 100, hi: 200 }
+      ],
+      shared: [
+        { label: "🏨 Oceanfront condo (4 nts)", lo: 1500, hi: 2500 }
+      ]
+    },
     stay: "An oceanfront condo or resort tower — big units, pools, and a balcony over the sand for not much money.",
     food: "Calabash-style seafood buffets, local breweries, and classic beach-town eats.",
     drinks: "Broadway at the Beach and the Market Common bars — solid nightlife without the big-city price tag.",
