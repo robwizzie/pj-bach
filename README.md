@@ -2,7 +2,7 @@
 
 An interactive, game-show-style website that lets **PJ pick his own bachelor
 trip** by opening mystery doors, trading them, and locking one in — instead of
-a boring PowerPoint. Built by the (clearly superior) best men.
+a boring PowerPoint. A gift from PJ's two best men — it's all about hyping him up.
 
 ## ▶️ How to run it
 It's a plain static site — no build step, no dependencies.
