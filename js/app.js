@@ -221,46 +221,67 @@
   }
 
   /* ---------- Trip modal ---------- */
+  const VIBE_EMOJI = { Beach: "🏖️", Nightlife: "🌃", Billiards: "🎱", Food: "🍔", Chill: "😎" };
+
   function openModal(id) {
     const trip = tripById(id);
     currentTripId = id;
     markOpened(id);
-
-    $("#nav-label").textContent = "Door " + trip.door + " of " + TRIPS.length;
+    updateNav();
 
     const body = $("#modal-body");
     body.innerHTML = "";
 
+    // Hero
     const hero = document.createElement("div");
     hero.className = "trip-hero";
     hero.appendChild(imageSlot(trip.hero, trip.name + " hero shot"));
     const ov = document.createElement("div");
     ov.className = "trip-hero-overlay";
-    ov.innerHTML = '<h2>' + trip.emoji + " " + trip.name + '</h2><div class="tag">' + trip.tagline + '</div>';
+    ov.innerHTML =
+      '<span class="th-door">Door ' + trip.door + '</span>' +
+      '<h2>' + trip.emoji + " " + trip.name + '</h2>' +
+      '<div class="tag">' + trip.tagline + '</div>';
     hero.appendChild(ov);
     body.appendChild(hero);
 
     const wrap = document.createElement("div");
     wrap.className = "trip-body";
+
+    const chips = Object.keys(trip.vibe)
+      .filter((k) => trip.vibe[k] >= 4)
+      .map((k) => '<span class="chip">' + (VIBE_EMOJI[k] || "") + " " + k + "</span>")
+      .join("");
+
+    const costRows = (trip.breakdown || [])
+      .map((b) => '<li><span>' + b.label + '</span><b>' + b.cost + '</b></li>')
+      .join("");
+
     wrap.innerHTML =
-      '<div class="price-banner">' +
-        '<span class="big">' + trip.price + '</span>' +
-        '<span class="note">' + trip.priceNote + '</span>' +
+      '<div class="price-row">' +
+        '<div class="price-main"><span class="pm-amt">' + trip.price + '</span>' +
+        '<span class="pm-note">' + trip.priceNote + '</span></div>' +
+        (chips ? '<div class="chips">' + chips + '</div>' : "") +
       '</div>' +
-      '<div class="detail-grid">' +
-        detail("🏨", "Where we stay", trip.stay) +
-        detail("🍔", "Food", trip.food) +
-        detail("🍻", "Drinks & bars", trip.drinks) +
-        detail("🎱", "Billiards & activities", trip.billiards) +
-        detail("🏖️", "Beach", trip.beach) +
-        detail("🌃", "Nightlife", trip.nightlife) +
+      '<details class="cost-box" open>' +
+        '<summary>💰 Where the money goes <span class="cb-tag">est. per person</span></summary>' +
+        '<ul class="cost-list">' + costRows + '</ul>' +
+        '<p class="cost-foot">Ballpark for a crew of ~10 — the more guys come, the cheaper it gets. Confirm before booking.</p>' +
+      '</details>' +
+      '<div class="rundown">' +
+        rd("🏨", "Where we stay", trip.stay) +
+        rd("🍔", "Food", trip.food) +
+        rd("🍻", "Drinks & bars", trip.drinks) +
+        rd("🎱", "Billiards & activities", trip.billiards) +
+        rd("🏖️", "Beach", trip.beach) +
+        rd("🌃", "Nightlife", trip.nightlife) +
       '</div>';
 
     const vibe = document.createElement("div");
     vibe.className = "vibe";
-    vibe.innerHTML = "<h4>The vibe-o-meter 📊</h4>" +
+    vibe.innerHTML = "<h4>📊 Vibe check</h4>" +
       Object.keys(trip.vibe).map((k) =>
-        '<div class="vibe-row"><span>' + k + '</span>' +
+        '<div class="vibe-row"><span>' + (VIBE_EMOJI[k] || "") + " " + k + '</span>' +
         '<div class="vibe-bar"><div class="vibe-fill" data-pct="' + (trip.vibe[k] * 20) + '"></div></div></div>'
       ).join("");
     wrap.appendChild(vibe);
@@ -274,7 +295,7 @@
 
     const gt = document.createElement("h4");
     gt.className = "gallery-title";
-    gt.textContent = "📸 How the trip would actually go (add your AI pics here):";
+    gt.textContent = "📸 How it'd actually go down";
     wrap.appendChild(gt);
     const gal = document.createElement("div");
     gal.className = "gallery";
@@ -284,7 +305,7 @@
     const actions = document.createElement("div");
     actions.className = "modal-actions";
     actions.innerHTML =
-      '<button class="btn-lock">😍 Lock in ' + trip.name + '!</button>' +
+      '<button class="btn-lock">😍 Lock in ' + trip.name + '</button>' +
       '<button class="btn-trade">🔄 Trade — surprise me</button>' +
       '<button class="btn-secondary">👀 Back to doors</button>';
     wrap.appendChild(actions);
@@ -301,21 +322,40 @@
     const overlay = $("#modal-overlay");
     overlay.classList.remove("hidden");
     overlay.scrollTop = 0;
+    $("#modal").scrollTop = 0;
   }
 
-  function detail(icon, title, text) {
-    return '<div class="detail"><h4>' + icon + " " + title + '</h4><p>' + text + '</p></div>';
+  function rd(icon, label, text) {
+    return '<div class="rd-item"><span class="rd-ic">' + icon + '</span>' +
+           '<div class="rd-txt"><b>' + label + '</b><p>' + text + '</p></div></div>';
   }
 
   function closeModal() { $("#modal-overlay").classList.add("hidden"); currentTripId = null; }
 
+  // Navigation only cycles through doors PJ has already opened.
+  function openedTripList() { return TRIPS.filter((t) => opened.has(t.id)); }
+
+  function updateNav() {
+    const list = openedTripList();
+    const n = list.length;
+    const idx = list.findIndex((t) => t.id === currentTripId);
+    $("#nav-label").textContent = n > 1 ? ("Opened door " + (idx + 1) + " of " + n) : "Only door open";
+    const off = n <= 1;
+    [$("#prev-trip"), $("#next-trip")].forEach((btn) => {
+      btn.disabled = off;
+      btn.classList.toggle("nav-off", off);
+      btn.title = off ? "Open more doors to flip between them" : "Flip between opened doors";
+    });
+  }
+
   function navTrip(dir) {
-    if (currentTripId == null) return;
-    const i = tripIndex(currentTripId);
-    const n = TRIPS.length;
-    const next = TRIPS[(i + dir + n) % n];
+    const list = openedTripList();
+    if (list.length <= 1) return;
+    let idx = list.findIndex((t) => t.id === currentTripId);
+    if (idx < 0) return;
+    idx = (idx + dir + list.length) % list.length;
     sfx.click();
-    openModal(next.id);
+    openModal(list[idx].id);
   }
 
   /* ---------- Trade ---------- */
