@@ -271,8 +271,8 @@ body {
 .modal-close:hover { background: #000; transform: scale(1.08); }
 
 .trip-hero { position: relative; }
-.trip-hero .image-slot { height: 230px; border-radius: 0; }
-.trip-hero .image-slot img { object-position: center 28%; }
+.trip-hero .image-slot { aspect-ratio: 3 / 2; border-radius: 0; }
+.trip-hero .image-slot img { object-position: center; }
 .trip-hero-overlay {
   position: absolute; left: 0; right: 0; bottom: 0;
   padding: 1.2rem 1.4rem .9rem;
@@ -477,7 +477,7 @@ body {
   background: #fff; color: var(--ink); border-radius: 20px;
   overflow: hidden; box-shadow: var(--shadow); text-align: left;
 }
-.finale-summary .fs-hero .image-slot { height: 200px; border-radius: 0; }
+.finale-summary .fs-hero .image-slot { aspect-ratio: 3 / 2; border-radius: 0; }
 .finale-summary .fs-body { padding: 1.2rem 1.4rem; }
 .finale-summary h3 { font-family:"Bungee",cursive; margin:.2rem 0; }
 .finale-summary ul { margin: .6rem 0 0; padding-left: 1.1rem; }
