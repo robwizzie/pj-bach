@@ -32,6 +32,7 @@
     <div class="topbar-controls">
       <span class="counter" id="counter" title="Doors PJ has peeked behind">🚪 <b id="opened-count">0</b>/<b id="total-doors">7</b> opened</span>
       <button class="pill-btn" id="seeall-btn"><span class="pi">📋</span><span class="pl">See all</span></button>
+      <button class="pill-btn" id="announcer-btn"><span class="pi">🎙️</span><span class="pl">Voice</span></button>
       <button class="pill-btn" id="music-btn"><span class="pi">🎵</span><span class="pl">Music</span></button>
       <button class="pill-btn" id="mute-btn"><span class="pi">🔊</span><span class="pl">Sound</span></button>
       <button class="pill-btn" id="reset-btn"><span class="pi">↻</span><span class="pl">Restart</span></button>
@@ -81,6 +82,7 @@
       <button class="cta-ghost" id="dealer-btn">🎲 Dealer's choice</button>
       <button class="cta-ghost" id="decide-btn">🧭 Help me decide</button>
       <button class="cta-ghost" id="showdown-btn">⚔️ Trip showdown</button>
+      <button class="cta-ghost" id="results-btn">📊 Vote results</button>
       <button class="cta-ghost" id="stage-seeall">📋 See all 7</button>
     </div>
     <div class="locked-banner hidden" id="locked-banner"></div>
@@ -99,7 +101,18 @@
     <div class="compare-grid" id="compare-grid"><!-- cards injected by JS --></div>
     <div class="compare-table-wrap hidden" id="compare-table-wrap"><!-- table injected by JS --></div>
     <div class="stage-tools">
+      <button class="cta-ghost" id="compare-results">📊 Vote results</button>
       <button class="cta-ghost" id="compare-back">⬅ Back to the doors</button>
+    </div>
+  </section>
+
+  <!-- ===== Vote results / leaderboard ===== -->
+  <section id="results" class="results screen hidden">
+    <h2 class="stage-heading">🏆 The Leaderboard</h2>
+    <p class="stage-tip">How the crew's votes stack up. Tap a trip for details, or lock in a winner.</p>
+    <div class="results-list" id="results-list"><!-- rows injected by JS --></div>
+    <div class="stage-tools">
+      <button class="cta-ghost" id="results-back">⬅ Back to the doors</button>
     </div>
   </section>
 
