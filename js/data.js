@@ -29,6 +29,11 @@ const TRIPS = [
     tagline: "South Beach, neon nights & Cuban food",
     color: "#ff4d9d",
     peek: "🌴 🌃 🍹",
+    roasts: [
+      "Miami?! PJ's gonna drop four hundred bucks on a club table and be asleep by eleven.",
+      "South Beach, baby — the only six-pack PJ's bringing is in the cooler.",
+      "PJ at a Miami pool party: sunscreen on the bald spot, socks still on."
+    ],
     priceNote: "per person · 4 nights · all-in",
     travel: { drivable: false, short: "✈️ ~3 hr", badge: "✈️ Fly from Philly (PHL) — ~3 hr nonstop. Way too far to drive (~18 hr from South Jersey)." },
     catch: "Priciest nightlife on the board and Philly→Miami flights aren't cheap — but you get the full beach-by-day, clubs-by-night package.",
@@ -67,6 +72,11 @@ const TRIPS = [
     tagline: "All-inclusive party on the water",
     color: "#21c7e8",
     peek: "🚢 🎰 🏝️",
+    roasts: [
+      "A cruise? PJ's gonna gain twelve pounds and call it the bachelor bulk.",
+      "PJ on a boat — seasick by noon, king of the world by midnight, crying by one.",
+      "Unlimited buffet and PJ on the same ship? She's gonna list to one side."
+    ],
     priceNote: "per person · 4 nights · incl. flights to the port",
     travel: { drivable: false, short: "✈️ to port", badge: "✈️ Fly ~3 hr to a Florida port (Miami/Orlando) for a 4-night Bahamas sailing. 💡 Money-saver: drive just ~1½ hr to Cape Liberty in Bayonne, NJ and cruise from home with zero flights — but those sailings run longer (7+ nights)." },
     catch: "You're on the ship's schedule, cabins are cozy (read: small), and the flights to Florida are the real cost — the cruise fare itself is the cheap part.",
@@ -105,6 +115,11 @@ const TRIPS = [
     tagline: "Duval Street crawl & island time",
     color: "#ffb020",
     peek: "🏝️ 🍹 🎣",
+    roasts: [
+      "Key West — PJ on Duval Street is a danger to himself and at least three bar stools.",
+      "Four nights in the Keys? PJ's liver just filed for divorce too.",
+      "PJ in Key West: factor fifty sunscreen, factor one hundred regret."
+    ],
     priceNote: "per person · 4 nights · the splurge island",
     travel: { drivable: false, short: "✈️ + drive", badge: "✈️ Fly to Miami (~3 hr from PHL) then a scenic 3½-hr drive down the Keys — or fly straight into Key West (EYW, pricier). Not drivable from NJ (~21 hr)." },
     catch: "The most expensive option — it's a remote island, so both flights and lodging run high. Worth it for the all-walkable Duval party.",
@@ -143,6 +158,11 @@ const TRIPS = [
     tagline: "Giant beach house & a game room",
     color: "#2ecc71",
     peek: "🏖️ 🎱 🔥",
+    roasts: [
+      "Outer Banks — PJ swears he'll grill, burns everything, then blames the propane.",
+      "A house with a pool table? PJ's gonna lose at his own game and still talk trash.",
+      "PJ at the beach: 'I'll just get a little color' — comes back a fire hydrant."
+    ],
     priceNote: "per person · 5 nights · best value",
     travel: { drivable: true, short: "🚗 ~6½ hr", badge: "🚗 Totally drivable! ~6½ hr straight down from South Jersey. Pile into a couple cars — no airport, no flights, no baggage fees." },
     catch: "Nightlife is house-party and bonfire vibes, not a club scene. If PJ wants wild bars every night, this isn't the one.",
@@ -180,6 +200,11 @@ const TRIPS = [
     tagline: "Broadway honky-tonks & hot chicken",
     color: "#a05cff",
     peek: "🤠 🎸 🍗",
+    roasts: [
+      "Nashville — PJ sings one country song and suddenly thinks he's got a record deal.",
+      "Broadway, baby! PJ on a mechanical bull lasts a proud one-point-two seconds.",
+      "PJ plus Nashville hot chicken is a bathroom situation we'll be discussing for years."
+    ],
     priceNote: "per person · 3 nights · bachelor-party capital",
     travel: { drivable: false, short: "✈️ ~2½ hr", badge: "✈️ Fly from Philly (PHL) — ~2½ hr nonstop. It's a ~12-hr drive, so flying's the move." },
     catch: "No beach and no ocean — this one's purely bars, live music, and food. If a beach is non-negotiable for PJ, skip it.",
@@ -217,6 +242,11 @@ const TRIPS = [
     tagline: "Beach + nightlife on a budget",
     color: "#ff6a3d",
     peek: "⛱️ 🎢 ⛳",
+    roasts: [
+      "Myrtle Beach — PJ's idea of golf is four beers and one swing.",
+      "PJ on the SkyWheel, screaming like he didn't choose to get on it.",
+      "Myrtle Beach: where PJ's tan lines and his dignity both vanish."
+    ],
     priceNote: "per person · 4 nights · cheapest beach + nightlife",
     travel: { drivable: true, short: "🚗 ~9 hr / ✈️", badge: "🚗 Drivable in ~9 hr from South Jersey — or grab a cheap nonstop from Philly (PHL → MYR, often under $150 round-trip). Your call." },
     catch: "A bit more low-key and family-friendly than Miami. The long drive (or a budget flight) is the trade-off for the lowest price here.",
@@ -254,6 +284,11 @@ const TRIPS = [
     tagline: "Why leave? It's all right here, baby.",
     color: "#7cb342",
     peek: "🍺 🎱 🎡",
+    roasts: [
+      "South Jersey?! PJ found a way to throw a bachelor party AND make it to work Monday.",
+      "The boys at Wilson's — PJ runs the table, runs his mouth, then runs a tab he can't cover.",
+      "A free bachelor party in his own hometown. PJ, you absolute legend… and cheapskate."
+    ],
     free: true,
     priceNote: "per person · however long you want · gloriously FREE",
     travel: { drivable: true, short: "🚗 ~0 min", badge: "🚗 You're already here. Roll off the couch (~0–30 min). Zero flights, zero packing, zero excuses, zero dollars." },
