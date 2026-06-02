@@ -78,6 +78,7 @@ body {
 }
 .pill-btn:hover { background: rgba(255,255,255,.26); transform: translateY(-1px); }
 .pill-btn .pi { font-size: 1.05rem; }
+.pill-btn.is-off { opacity: .45; }
 @media (max-width: 620px) {
   .brand-text { display: none; }
   .counter { display: none; }
