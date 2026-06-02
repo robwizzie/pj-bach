@@ -17,11 +17,6 @@
   let activeFilter = null;     // { matchIds:Set, topId, summary }
 
   const VIBE_EMOJI = { Beach: "🏖️", Nightlife: "🌃", Billiards: "🎱", Food: "🍔", Chill: "😎" };
-  const CATCHPHRASES = [
-    "Ohhh, now we're talkin'! 🔥", "The crowd goes WILD! 👏", "Spicy choice, PJ! 🌶️",
-    "I like where your head's at! 🧠", "That's a vibe. 😎", "Big move, big man! 💪",
-    "Could this be THE one?? 👀", "Somebody's getting married! 💍"
-  ];
 
   /* ---------- Persistence ---------- */
   const SAVE_KEY = "pj-bach-state";
@@ -164,7 +159,7 @@
     beatIx++;
   }
   function startMusic() {
-    if (!soundOn || !musicOn) return; ensureAudio(); if (!actx || musicTimer) return;
+    if (!musicOn) return; ensureAudio(); if (!actx || musicTimer) return;
     musicGain.gain.setTargetAtTime(0.5, actx.currentTime, 0.4);
     beatIx = 0; musicTick(); musicTimer = setInterval(musicTick, 535);
   }
@@ -177,17 +172,46 @@
   /* ---------- Announcer (game-show voice via Web Speech) ---------- */
   let announcerOn = true;
   const hasTTS = typeof window !== "undefined" && "speechSynthesis" in window;
+  let hostVoice = null;
+  function pickVoice() {
+    if (!hasTTS) return;
+    const vs = speechSynthesis.getVoices(); if (!vs.length) return;
+    const good = /natural|neural|google|enhanced|premium/i;
+    const male = /(guy|christopher|roger|davis|tony|brian|eric|aaron|daniel|alex|david|fred|james|matthew|liam|ryan|mark|george|arthur)/i;
+    const female = /(zira|samantha|female|victoria|karen|moira|tessa|susan|hazel|fiona|catherine|serena|sonia)/i;
+    let best = null, bestScore = -2;
+    vs.forEach((v) => {
+      if (!/^en/i.test(v.lang)) return;
+      let s = 0;
+      if (good.test(v.name)) s += 6;
+      if (male.test(v.name)) s += 4;
+      if (female.test(v.name)) s -= 5;
+      if (/en[-_]US/i.test(v.lang)) s += 2; else if (/en[-_]GB/i.test(v.lang)) s += 1;
+      if (v.localService === false) s += 1; // online/neural voices are usually nicer
+      if (s > bestScore) { bestScore = s; best = v; }
+    });
+    hostVoice = best || vs.find((v) => /^en/i.test(v.lang)) || vs[0];
+  }
+  if (hasTTS) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
   function announce(text, opts) {
-    if (!announcerOn || !soundOn || !hasTTS) return;
+    if (!announcerOn || !hasTTS) return;
     try {
       opts = opts || {};
       const u = new SpeechSynthesisUtterance(text);
-      u.rate = opts.rate || 0.95; u.pitch = opts.pitch != null ? opts.pitch : 1.05; u.volume = opts.volume || 1;
+      if (hostVoice) u.voice = hostVoice;
+      u.rate = opts.rate || 0.86;                          // slower = smoother, less robotic
+      u.pitch = opts.pitch != null ? opts.pitch : 0.8;     // lower = warmer, host-like
+      u.volume = opts.volume || 1;
       speechSynthesis.cancel();
       speechSynthesis.speak(u);
     } catch (e) {}
   }
   function stopAnnounce() { if (hasTTS) { try { speechSynthesis.cancel(); } catch (e) {} } }
+  function pickRoast(trip) {
+    const r = trip.roasts;
+    if (!r || !r.length) return "Bold choice, PJ. Bold choice.";
+    return r[(Math.random() * r.length) | 0];
+  }
 
   /* ---------- Confetti ---------- */
   const canvas = $("#confetti-canvas"), ctx = canvas.getContext("2d");
@@ -222,7 +246,6 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.classList.add("hidden"), 300); }, 2600);
   }
-  const randCatch = () => CATCHPHRASES[(Math.random() * CATCHPHRASES.length) | 0];
 
   /* ---------- Doors ---------- */
   function renderDoors() {
@@ -279,8 +302,10 @@
       const trip = tripById(id);
       countdown(() => {
         face.classList.add("open"); door.classList.add("is-open");
-        sfx.open(); burst(50); showToast(randCatch());
-        announce("Door " + trip.door + "... " + trip.name + "!");
+        sfx.open(); burst(50);
+        const roast = pickRoast(trip);
+        showToast("🔥 " + roast);
+        announce("Door " + trip.door + "... " + trip.name + "! " + roast);
         setTimeout(() => openModal(id), 350);
       });
     } else { sfx.click(); openModal(id); }
@@ -662,23 +687,13 @@
     renderDoors(); showScreen("stage");
   }
 
-  /* ---------- Share ---------- */
-  function share() {
-    const url = location.href.split("#")[0];
-    const data = { title: "PJ's Bachelor Blowout", text: "Help PJ pick his bachelor trip — behind the doors! 🎉🦅", url };
-    if (navigator.share) { navigator.share(data).catch(() => {}); }
-    else if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(url).then(() => showToast("Link copied — send it to the crew! 📋")).catch(() => showToast(url)); }
-    else { showToast(url); }
-  }
-
   /* ---------- Controls ---------- */
   $("#start-btn").addEventListener("click", () => {
     kickAudio(); sfx.fanfare();
-    announce("Ladies and gentlemen, welcome to PJ's Bachelor Blowout! Pick a door, PJ!", { rate: 0.95 });
+    announce("Ladies and gentlemen, the man of the hour... PJ! Welcome to your Bachelor Blowout. Pick a door!", { rate: 0.86 });
     showScreen("stage");
   });
   $("#browse-btn").addEventListener("click", () => { kickAudio(); sfx.click(); renderCompare(); showScreen("compare"); });
-  $("#share-btn").addEventListener("click", () => { sfx.click(); share(); });
   $("#results-btn").addEventListener("click", openResults);
   $("#results-back").addEventListener("click", () => showScreen("stage"));
   $("#compare-results").addEventListener("click", openResults);
@@ -720,31 +735,28 @@
   $("#finale-restart").addEventListener("click", () => askConfirm("Wipe everything and play the whole game again from scratch?", fullReset));
   $("#finale-print").addEventListener("click", () => window.print());
 
-  function syncMuteBtn() {
-    $("#mute-btn").querySelector(".pi").textContent = soundOn ? "🔊" : "🔇";
-    $("#mute-btn").querySelector(".pl").textContent = soundOn ? "Sound" : "Muted";
+  /* ---------- Settings panel (audio) ---------- */
+  function syncSettings() {
+    $("#toggle-sound").classList.toggle("is-on", soundOn);
+    $("#toggle-music").classList.toggle("is-on", musicOn);
+    $("#toggle-voice").classList.toggle("is-on", announcerOn);
   }
-  function syncMusicBtn() {
-    $("#music-btn").classList.toggle("is-off", !musicOn);
-    $("#music-btn").querySelector(".pl").textContent = musicOn ? "Music" : "Music off";
-  }
-  function syncAnnouncerBtn() {
-    const b = $("#announcer-btn"); if (!b) return;
-    b.classList.toggle("is-off", !announcerOn);
-    b.querySelector(".pl").textContent = announcerOn ? "Voice" : "Voice off";
-  }
-  $("#announcer-btn").addEventListener("click", () => {
-    announcerOn = !announcerOn; save(); syncAnnouncerBtn();
-    if (announcerOn && soundOn) { kickAudio(); announce("Announcer on! Let's play!"); }
-    else stopAnnounce();
+  function openSettings() { kickAudio(); sfx.click(); syncSettings(); $("#settings-overlay").classList.remove("hidden"); }
+  function closeSettings() { $("#settings-overlay").classList.add("hidden"); }
+  $("#settings-btn").addEventListener("click", openSettings);
+  $("#settings-close").addEventListener("click", closeSettings);
+  $("#settings-overlay").addEventListener("click", (e) => { if (e.target.id === "settings-overlay") closeSettings(); });
+  $("#toggle-sound").addEventListener("click", () => {
+    soundOn = !soundOn; save(); syncSettings();
+    if (soundOn) { ensureAudio(); sfx.click(); }
   });
-  $("#mute-btn").addEventListener("click", () => {
-    soundOn = !soundOn; save(); syncMuteBtn();
-    if (soundOn) { kickAudio(); sfx.click(); } else { stopMusic(); stopAnnounce(); }
+  $("#toggle-music").addEventListener("click", () => {
+    musicOn = !musicOn; save(); syncSettings();
+    if (musicOn) kickAudio(); else stopMusic();
   });
-  $("#music-btn").addEventListener("click", () => {
-    musicOn = !musicOn; save(); syncMusicBtn();
-    if (musicOn && soundOn) { kickAudio(); sfx.click(); } else { stopMusic(); }
+  $("#toggle-voice").addEventListener("click", () => {
+    announcerOn = !announcerOn; save(); syncSettings();
+    if (announcerOn) announce("Announcer, back in the building."); else stopAnnounce();
   });
   $("#reset-btn").addEventListener("click", () => askConfirm("Start the whole game over for PJ? (Clears opened doors and votes.)", fullReset));
   $("#confirm-yes").addEventListener("click", () => closeConfirm(true));
@@ -762,6 +774,7 @@
     if (e.key === "Escape") {
       if (!$("#confirm-overlay").classList.contains("hidden")) return closeConfirm(false);
       if (!$("#countdown-overlay").classList.contains("hidden")) return;
+      if (!$("#settings-overlay").classList.contains("hidden")) return closeSettings();
       if (!$("#decide-overlay").classList.contains("hidden")) return closeDecide();
       if (!$("#showdown-overlay").classList.contains("hidden")) return closeShowdown();
       if (!$("#modal-overlay").classList.contains("hidden")) return closeModal();
@@ -783,7 +796,7 @@
 
   /* ---------- Boot ---------- */
   load();
-  syncMuteBtn(); syncMusicBtn(); syncAnnouncerBtn();
+  syncSettings();
   renderDoors();
   // Start music on the first interaction anywhere (browsers block autoplay until a gesture)
   document.addEventListener("pointerdown", function once() { document.removeEventListener("pointerdown", once); kickAudio(); }, { once: true });

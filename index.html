@@ -32,9 +32,7 @@
     <div class="topbar-controls">
       <span class="counter" id="counter" title="Doors PJ has peeked behind">🚪 <b id="opened-count">0</b>/<b id="total-doors">7</b> opened</span>
       <button class="pill-btn" id="seeall-btn"><span class="pi">📋</span><span class="pl">See all</span></button>
-      <button class="pill-btn" id="announcer-btn"><span class="pi">🎙️</span><span class="pl">Voice</span></button>
-      <button class="pill-btn" id="music-btn"><span class="pi">🎵</span><span class="pl">Music</span></button>
-      <button class="pill-btn" id="mute-btn"><span class="pi">🔊</span><span class="pl">Sound</span></button>
+      <button class="pill-btn" id="settings-btn"><span class="pi">⚙️</span><span class="pl">Settings</span></button>
       <button class="pill-btn" id="reset-btn"><span class="pi">↻</span><span class="pl">Restart</span></button>
     </div>
   </header>
@@ -56,7 +54,6 @@
     <div class="intro-buttons">
       <button class="cta" id="start-btn">Let's Play! 🚪✨</button>
       <button class="cta-ghost" id="browse-btn">Just show me all 7 options 📋</button>
-      <button class="cta-ghost" id="share-btn">📲 Share with the crew</button>
     </div>
 
     <details class="how-to">
@@ -173,6 +170,19 @@
     <h2 class="sd-title">⚔️ TRIP SHOWDOWN</h2>
     <p class="sd-progress" id="sd-progress"></p>
     <div class="sd-arena" id="sd-arena"><!-- two contenders injected by JS --></div>
+  </div>
+
+  <!-- ===== Settings (audio) ===== -->
+  <div class="sheet-overlay hidden" id="settings-overlay">
+    <div class="sheet">
+      <button class="sheet-close" id="settings-close" title="Close">✕</button>
+      <h3>⚙️ Settings</h3>
+      <p class="sheet-sub">Sound &amp; vibe controls for the show.</p>
+      <button class="toggle-row" id="toggle-sound"><span class="tr-label">🔊 Sound effects</span><span class="switch"></span></button>
+      <button class="toggle-row" id="toggle-music"><span class="tr-label">🎵 Background music</span><span class="switch"></span></button>
+      <button class="toggle-row" id="toggle-voice"><span class="tr-label">🎙️ Announcer voice</span><span class="switch"></span></button>
+      <p class="settings-note">🎙️ The announcer uses your device's built-in voice, so it sounds a little different on each phone or laptop. For the best host vibe, present from a laptop in Chrome.</p>
+    </div>
   </div>
 
   <!-- ===== Reveal countdown ===== -->
