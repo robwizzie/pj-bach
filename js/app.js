@@ -21,7 +21,7 @@
   /* ---------- Persistence ---------- */
   const SAVE_KEY = "pj-bach-state";
   function save() {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({ opened: [...opened], lockedId, soundOn, musicOn, announcerOn, votes }));
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ opened: [...opened], lockedId, soundOn, musicOn, votes }));
   }
   function load() {
     try {
@@ -30,7 +30,6 @@
       lockedId = s.lockedId || null;
       if (typeof s.soundOn === "boolean") soundOn = s.soundOn;
       if (typeof s.musicOn === "boolean") musicOn = s.musicOn;
-      if (typeof s.announcerOn === "boolean") announcerOn = s.announcerOn;
       if (s.votes) votes = s.votes;
     } catch (e) {}
   }
@@ -169,70 +168,6 @@
   }
   function kickAudio() { ensureAudio(); if (actx && actx.state === "suspended") actx.resume(); startMusic(); }
 
-  /* ---------- Announcer (game-show voice via Web Speech) ---------- */
-  let announcerOn = true;
-  const hasTTS = typeof window !== "undefined" && "speechSynthesis" in window;
-  let hostVoice = null;
-  function pickVoice() {
-    if (!hasTTS) return;
-    const vs = speechSynthesis.getVoices(); if (!vs.length) return;
-    const good = /natural|neural|google|enhanced|premium/i;
-    const male = /(guy|christopher|roger|davis|tony|brian|eric|aaron|daniel|alex|david|fred|james|matthew|liam|ryan|mark|george|arthur)/i;
-    const female = /(zira|samantha|female|victoria|karen|moira|tessa|susan|hazel|fiona|catherine|serena|sonia)/i;
-    let best = null, bestScore = -2;
-    vs.forEach((v) => {
-      if (!/^en/i.test(v.lang)) return;
-      let s = 0;
-      if (good.test(v.name)) s += 6;
-      if (male.test(v.name)) s += 4;
-      if (female.test(v.name)) s -= 5;
-      if (/en[-_]US/i.test(v.lang)) s += 2; else if (/en[-_]GB/i.test(v.lang)) s += 1;
-      if (v.localService === false) s += 1; // online/neural voices are usually nicer
-      if (s > bestScore) { bestScore = s; best = v; }
-    });
-    hostVoice = best || vs.find((v) => /^en/i.test(v.lang)) || vs[0];
-  }
-  if (hasTTS) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
-  function announce(text, opts) {
-    if (!announcerOn || !hasTTS) return;
-    try {
-      opts = opts || {};
-      const u = new SpeechSynthesisUtterance(text);
-      if (hostVoice) u.voice = hostVoice;
-      u.rate = opts.rate || 0.86;                          // slower = smoother, less robotic
-      u.pitch = opts.pitch != null ? opts.pitch : 0.8;     // lower = warmer, host-like
-      u.volume = opts.volume || 1;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-    } catch (e) {}
-  }
-  function stopAnnounce() { if (hasTTS) { try { speechSynthesis.cancel(); } catch (e) {} } }
-  function pickRoastIndex(trip) {
-    const r = trip.roasts;
-    if (!r || !r.length) return -1;
-    return (Math.random() * r.length) | 0;
-  }
-
-  /* Pre-generated narrator clips (free, made with edge-tts) play when present;
-     otherwise we fall back to the browser's built-in voice. See tools/generate-voice.py */
-  let currentClip = null;
-  function stopVoice() {
-    if (currentClip) { try { currentClip.pause(); } catch (e) {} currentClip = null; }
-    stopAnnounce();
-  }
-  function say(key, text, opts) {
-    if (!announcerOn) return;
-    stopVoice();
-    if (!key) { announce(text, opts); return; }
-    const a = new Audio("voice/" + key + ".mp3");
-    currentClip = a; a.volume = 1;
-    let done = false;
-    const fallback = () => { if (done) return; done = true; if (currentClip === a) currentClip = null; announce(text, opts); };
-    a.onerror = fallback;
-    a.onended = () => { if (currentClip === a) currentClip = null; };
-    const p = a.play();
-    if (p && p.catch) p.catch(fallback);
-  }
 
   /* ---------- Confetti ---------- */
   const canvas = $("#confetti-canvas"), ctx = canvas.getContext("2d");
@@ -324,10 +259,7 @@
       countdown(() => {
         face.classList.add("open"); door.classList.add("is-open");
         sfx.open(); burst(50);
-        const ri = pickRoastIndex(trip);
-        const roast = ri >= 0 ? trip.roasts[ri] : "Bold choice, PJ.";
-        showToast("🔥 " + roast);
-        say(ri >= 0 ? "reveal-" + trip.id + "-" + ri : null, "Door " + trip.door + "... " + trip.name + "! " + roast);
+        showToast(trip.emoji + " " + trip.name + "!");
         setTimeout(() => openModal(id), 350);
       });
     } else { sfx.click(); openModal(id); }
@@ -603,8 +535,6 @@
   function lockIn(id) {
     lockedId = id; save(); closeModal(); closeShowdown();
     sfx.win(); burst(260); setTimeout(() => burst(180), 400); setTimeout(() => burst(180), 800);
-    const trip = tripById(id);
-    say("lockin-" + id, "And it's official! PJ is going to... " + trip.name + "! Let's go!", { rate: 0.9 });
     renderDoors(); showFinale(id);
   }
   function showFinale(id) {
@@ -685,7 +615,6 @@
   }
   function renderChampion() {
     const t = sdChampion; sfx.win(); burst(220);
-    say("champ-" + t.id, "Your champion is... " + t.name + "!", { rate: 0.92 });
     $("#sd-progress").textContent = "👑 Your champion!";
     $("#sd-arena").innerHTML =
       '<div class="sd-winner" style="--accent:' + t.color + '"><div class="sd-emoji">' + t.emoji + '</div>' +
@@ -712,7 +641,6 @@
   /* ---------- Controls ---------- */
   $("#start-btn").addEventListener("click", () => {
     kickAudio(); sfx.fanfare();
-    say("welcome", "Ladies and gentlemen, the man of the hour... PJ! Welcome to your Bachelor Blowout. Pick a door!", { rate: 0.86 });
     showScreen("stage");
   });
   $("#browse-btn").addEventListener("click", () => { kickAudio(); sfx.click(); renderCompare(); showScreen("compare"); });
@@ -761,7 +689,6 @@
   function syncSettings() {
     $("#toggle-sound").classList.toggle("is-on", soundOn);
     $("#toggle-music").classList.toggle("is-on", musicOn);
-    $("#toggle-voice").classList.toggle("is-on", announcerOn);
   }
   function openSettings() { kickAudio(); sfx.click(); syncSettings(); $("#settings-overlay").classList.remove("hidden"); }
   function closeSettings() { $("#settings-overlay").classList.add("hidden"); }
@@ -775,10 +702,6 @@
   $("#toggle-music").addEventListener("click", () => {
     musicOn = !musicOn; save(); syncSettings();
     if (musicOn) kickAudio(); else stopMusic();
-  });
-  $("#toggle-voice").addEventListener("click", () => {
-    announcerOn = !announcerOn; save(); syncSettings();
-    if (announcerOn) announce("Announcer, back in the building."); else stopAnnounce();
   });
   $("#reset-btn").addEventListener("click", () => askConfirm("Start the whole game over for PJ? (Clears opened doors and votes.)", fullReset));
   $("#confirm-yes").addEventListener("click", () => closeConfirm(true));
