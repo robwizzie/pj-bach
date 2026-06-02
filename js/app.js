@@ -207,10 +207,31 @@
     } catch (e) {}
   }
   function stopAnnounce() { if (hasTTS) { try { speechSynthesis.cancel(); } catch (e) {} } }
-  function pickRoast(trip) {
+  function pickRoastIndex(trip) {
     const r = trip.roasts;
-    if (!r || !r.length) return "Bold choice, PJ. Bold choice.";
-    return r[(Math.random() * r.length) | 0];
+    if (!r || !r.length) return -1;
+    return (Math.random() * r.length) | 0;
+  }
+
+  /* Pre-generated narrator clips (free, made with edge-tts) play when present;
+     otherwise we fall back to the browser's built-in voice. See tools/generate-voice.py */
+  let currentClip = null;
+  function stopVoice() {
+    if (currentClip) { try { currentClip.pause(); } catch (e) {} currentClip = null; }
+    stopAnnounce();
+  }
+  function say(key, text, opts) {
+    if (!announcerOn) return;
+    stopVoice();
+    if (!key) { announce(text, opts); return; }
+    const a = new Audio("voice/" + key + ".mp3");
+    currentClip = a; a.volume = 1;
+    let done = false;
+    const fallback = () => { if (done) return; done = true; if (currentClip === a) currentClip = null; announce(text, opts); };
+    a.onerror = fallback;
+    a.onended = () => { if (currentClip === a) currentClip = null; };
+    const p = a.play();
+    if (p && p.catch) p.catch(fallback);
   }
 
   /* ---------- Confetti ---------- */
@@ -303,9 +324,10 @@
       countdown(() => {
         face.classList.add("open"); door.classList.add("is-open");
         sfx.open(); burst(50);
-        const roast = pickRoast(trip);
+        const ri = pickRoastIndex(trip);
+        const roast = ri >= 0 ? trip.roasts[ri] : "Bold choice, PJ.";
         showToast("🔥 " + roast);
-        announce("Door " + trip.door + "... " + trip.name + "! " + roast);
+        say(ri >= 0 ? "reveal-" + trip.id + "-" + ri : null, "Door " + trip.door + "... " + trip.name + "! " + roast);
         setTimeout(() => openModal(id), 350);
       });
     } else { sfx.click(); openModal(id); }
@@ -582,7 +604,7 @@
     lockedId = id; save(); closeModal(); closeShowdown();
     sfx.win(); burst(260); setTimeout(() => burst(180), 400); setTimeout(() => burst(180), 800);
     const trip = tripById(id);
-    announce("And it's official! PJ is going to... " + trip.name + "! Let's go!", { rate: 0.9 });
+    say("lockin-" + id, "And it's official! PJ is going to... " + trip.name + "! Let's go!", { rate: 0.9 });
     renderDoors(); showFinale(id);
   }
   function showFinale(id) {
@@ -663,7 +685,7 @@
   }
   function renderChampion() {
     const t = sdChampion; sfx.win(); burst(220);
-    announce("Your champion is... " + t.name + "!", { rate: 0.92 });
+    say("champ-" + t.id, "Your champion is... " + t.name + "!", { rate: 0.92 });
     $("#sd-progress").textContent = "👑 Your champion!";
     $("#sd-arena").innerHTML =
       '<div class="sd-winner" style="--accent:' + t.color + '"><div class="sd-emoji">' + t.emoji + '</div>' +
@@ -690,7 +712,7 @@
   /* ---------- Controls ---------- */
   $("#start-btn").addEventListener("click", () => {
     kickAudio(); sfx.fanfare();
-    announce("Ladies and gentlemen, the man of the hour... PJ! Welcome to your Bachelor Blowout. Pick a door!", { rate: 0.86 });
+    say("welcome", "Ladies and gentlemen, the man of the hour... PJ! Welcome to your Bachelor Blowout. Pick a door!", { rate: 0.86 });
     showScreen("stage");
   });
   $("#browse-btn").addEventListener("click", () => { kickAudio(); sfx.click(); renderCompare(); showScreen("compare"); });
