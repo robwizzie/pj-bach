@@ -26,7 +26,7 @@
   /* ---------- Persistence ---------- */
   const SAVE_KEY = "pj-bach-state";
   function save() {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({ opened: [...opened], lockedId, soundOn, votes }));
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ opened: [...opened], lockedId, soundOn, musicOn, votes }));
   }
   function load() {
     try {
@@ -34,6 +34,7 @@
       (s.opened || []).forEach((id) => opened.add(id));
       lockedId = s.lockedId || null;
       if (typeof s.soundOn === "boolean") soundOn = s.soundOn;
+      if (typeof s.musicOn === "boolean") musicOn = s.musicOn;
       if (s.votes) votes = s.votes;
     } catch (e) {}
   }
@@ -72,30 +73,105 @@
     return wrap;
   }
 
-  /* ---------- Sound ---------- */
-  let actx = null;
-  function tone(freq, dur, type, when, gain) {
-    if (!soundOn) return;
+  /* ---------- Sound & music engine (all synthesized, no audio files) ---------- */
+  let actx = null, master = null, musicGain = null;
+  let musicOn = true, musicTimer = null, beatIx = 0;
+
+  function ensureAudio() {
+    if (actx) { if (actx.state === "suspended") actx.resume(); return; }
     try {
-      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-      const o = actx.createOscillator(), g = actx.createGain();
-      o.type = type || "triangle"; o.frequency.value = freq;
-      const t = actx.currentTime + (when || 0);
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(gain || 0.18, t + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + dur + 0.02);
-    } catch (e) {}
+      actx = new (window.AudioContext || window.webkitAudioContext)();
+      master = actx.createGain(); master.gain.value = 0.9; master.connect(actx.destination);
+      musicGain = actx.createGain(); musicGain.gain.value = 0.0001; musicGain.connect(master);
+    } catch (e) { actx = null; }
   }
+  function tone(freq, dur, type, when, gain, dest) {
+    if (!soundOn) return; ensureAudio(); if (!actx) return;
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type || "triangle"; o.frequency.value = freq;
+    const t = actx.currentTime + (when || 0);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(gain || 0.18, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(dest || master); o.start(t); o.stop(t + dur + 0.05);
+  }
+  // shaped noise (claps / applause / whoosh)
+  let noiseBuf = null;
+  function noiseSrc() {
+    if (!noiseBuf) {
+      noiseBuf = actx.createBuffer(1, actx.sampleRate * 1.8, actx.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    const s = actx.createBufferSource(); s.buffer = noiseBuf; return s;
+  }
+  function applause(dur, peak) {
+    if (!soundOn) return; ensureAudio(); if (!actx) return;
+    dur = dur || 1.6; peak = peak || 0.45;
+    const src = noiseSrc(), bp = actx.createBiquadFilter(), g = actx.createGain();
+    bp.type = "bandpass"; bp.frequency.value = 1700; bp.Q.value = 0.5;
+    const t = actx.currentTime;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + 0.18);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(bp); bp.connect(g); g.connect(master); src.start(t); src.stop(t + dur);
+  }
+  function whoosh() {
+    if (!soundOn) return; ensureAudio(); if (!actx) return;
+    const src = noiseSrc(), bp = actx.createBiquadFilter(), g = actx.createGain();
+    bp.type = "bandpass"; bp.Q.value = 1.1;
+    const t = actx.currentTime;
+    bp.frequency.setValueAtTime(400, t); bp.frequency.exponentialRampToValueAtTime(3200, t + 0.3);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.22, t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
+    src.connect(bp); bp.connect(g); g.connect(master); src.start(t); src.stop(t + 0.4);
+  }
+  function fanfare() {
+    [523, 659, 784].forEach((f, i) => tone(f, .16, "sawtooth", i * .1, .15));
+    tone(1047, .55, "sawtooth", .32, .2); tone(784, .55, "sawtooth", .32, .11); tone(659, .55, "sawtooth", .32, .09);
+  }
+  const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
   const sfx = {
-    open: () => { tone(520, .12, "square", 0); tone(760, .14, "square", .08); },
+    open: () => { whoosh(); tone(520, .12, "square", 0); tone(760, .14, "square", .08); },
     click: () => tone(660, .06, "square", 0, .12),
-    win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, .22, "triangle", i * .12, .22)),
     vote: () => { tone(700, .07, "square", 0, .14); tone(950, .08, "square", .06, .12); },
     beep: () => tone(880, .09, "square", 0, .16),
     ding: () => { tone(1320, .2, "triangle", 0, .2); tone(1760, .2, "triangle", .04, .12); },
-    drum: () => { for (let i = 0; i < 7; i++) tone(160 + (i % 2) * 50, .05, "square", i * .055, .07); }
+    bell: () => { tone(1568, .25, "triangle", 0, .22); tone(2093, .32, "triangle", .12, .18); },
+    buzzer: () => { tone(220, .18, "sawtooth", 0, .2); tone(150, .3, "sawtooth", .13, .2); },
+    suspense: () => { for (let i = 0; i < 16; i++) tone(110 + (i % 2) * 28, .07, "square", i * .082, .05); },
+    fanfare: fanfare,
+    win: () => { fanfare(); applause(1.9, .5); }
   };
+
+  /* ---------- Background music loop (light, cheesy game-show vibe) ---------- */
+  const PROG = [ { r: 48, maj: true }, { r: 45, maj: false }, { r: 41, maj: true }, { r: 43, maj: true } ];
+  function musicTone(freq, dur, type, gain) {
+    if (!actx) return;
+    const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime;
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(gain, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(musicGain); o.start(t); o.stop(t + dur + 0.05);
+  }
+  function musicTick() {
+    const ch = PROG[Math.floor(beatIx / 4) % PROG.length], b = beatIx % 4;
+    const ints = ch.maj ? [0, 4, 7, 12] : [0, 3, 7, 12];
+    if (b === 0 || b === 2) musicTone(mtof(ch.r), .5, "triangle", .16);      // bouncy bass
+    musicTone(mtof(ch.r + 12 + ints[b]), .34, "triangle", .11);              // arpeggio melody
+    if (b % 2 === 1) musicTone(mtof(ch.r + 24 + ints[b]), .12, "square", .035); // sparkle
+    beatIx++;
+  }
+  function startMusic() {
+    if (!soundOn || !musicOn) return; ensureAudio(); if (!actx || musicTimer) return;
+    musicGain.gain.setTargetAtTime(0.5, actx.currentTime, 0.4);
+    beatIx = 0; musicTick(); musicTimer = setInterval(musicTick, 535);
+  }
+  function stopMusic() {
+    if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+    if (musicGain && actx) musicGain.gain.setTargetAtTime(0.0001, actx.currentTime, 0.25);
+  }
+  function kickAudio() { ensureAudio(); if (actx && actx.state === "suspended") actx.resume(); startMusic(); }
 
   /* ---------- Confetti ---------- */
   const canvas = $("#confetti-canvas"), ctx = canvas.getContext("2d");
@@ -206,7 +282,7 @@
     const n = opened.size;
     if (n === 0) line.innerHTML = "Tap a door to reveal the trip behind it. Peek at as many as you want before you pick.";
     else if (n < TRIPS.length) line.innerHTML = "<b>" + n + "</b> door" + (n > 1 ? "s" : "") + " open — found your trip yet, PJ? Keep peeking 👀 or lock one in.";
-    else line.innerHTML = "You've seen all 6, PJ! 🔥 Time to <b>lock in your winner</b>.";
+    else line.innerHTML = "You've seen all " + TRIPS.length + ", PJ! 🔥 Time to <b>lock in your winner</b>.";
   }
 
   /* ---------- Reveal countdown ---------- */
@@ -217,7 +293,7 @@
     const show = () => { num.textContent = n; num.classList.remove("pop"); void num.offsetWidth; num.classList.add("pop"); sfx.beep(); };
     const finish = () => { cdTimers.forEach(clearTimeout); cdTimers = []; ov.classList.add("hidden"); ov.onclick = null; cb(); };
     ov.onclick = finish;
-    ov.classList.remove("hidden"); sfx.drum(); show();
+    ov.classList.remove("hidden"); sfx.suspense(); show();
     const step = () => { n--; if (n >= 1) { show(); cdTimers.push(setTimeout(step, 480)); } else { ov.classList.add("hidden"); ov.onclick = null; sfx.ding(); cb(); } };
     cdTimers.push(setTimeout(step, 480));
   }
@@ -473,6 +549,7 @@
     }
     $("#filter-banner").classList.remove("hidden");
     $("#filter-banner").querySelector(".clear-filter").onclick = clearFilter;
+    if (matches.length) sfx.ding(); else sfx.buzzer();
     closeDecide(); renderDoors(); showScreen("stage");
   }
   function clearFilter() { activeFilter = null; $("#filter-banner").classList.add("hidden"); renderDoors(); }
@@ -498,7 +575,7 @@
     $("#sd-arena").innerHTML = sdCard(sdChampion, "champ") + '<div class="sd-vs">VS</div>' + sdCard(challenger, "challenger");
     $$("#sd-arena .sd-card").forEach((c) => (c.onclick = () => {
       if (c.dataset.side === "challenger") sdChampion = challenger;
-      sdPool.shift(); sdMatch++; sfx.beep(); burst(40); renderMatch();
+      sdPool.shift(); sdMatch++; sfx.bell(); burst(40); renderMatch();
     }));
   }
   function renderChampion() {
@@ -526,9 +603,19 @@
     renderDoors(); showScreen("stage");
   }
 
+  /* ---------- Share ---------- */
+  function share() {
+    const url = location.href.split("#")[0];
+    const data = { title: "PJ's Bachelor Blowout", text: "Help PJ pick his bachelor trip — behind the doors! 🎉🦅", url };
+    if (navigator.share) { navigator.share(data).catch(() => {}); }
+    else if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(url).then(() => showToast("Link copied — send it to the crew! 📋")).catch(() => showToast(url)); }
+    else { showToast(url); }
+  }
+
   /* ---------- Controls ---------- */
-  $("#start-btn").addEventListener("click", () => { sfx.click(); showScreen("stage"); });
-  $("#browse-btn").addEventListener("click", () => { sfx.click(); renderCompare(); showScreen("compare"); });
+  $("#start-btn").addEventListener("click", () => { kickAudio(); sfx.fanfare(); showScreen("stage"); });
+  $("#browse-btn").addEventListener("click", () => { kickAudio(); sfx.click(); renderCompare(); showScreen("compare"); });
+  $("#share-btn").addEventListener("click", () => { sfx.click(); share(); });
   $("#home-btn").addEventListener("click", () => { sfx.click(); showScreen("intro"); });
   $("#seeall-btn").addEventListener("click", () => { renderCompare(); showScreen("compare"); });
   $("#stage-seeall").addEventListener("click", () => { renderCompare(); showScreen("compare"); });
@@ -567,11 +654,22 @@
   $("#finale-restart").addEventListener("click", () => askConfirm("Wipe everything and play the whole game again from scratch?", fullReset));
   $("#finale-print").addEventListener("click", () => window.print());
 
-  $("#mute-btn").addEventListener("click", () => {
-    soundOn = !soundOn; save();
+  function syncMuteBtn() {
     $("#mute-btn").querySelector(".pi").textContent = soundOn ? "🔊" : "🔇";
     $("#mute-btn").querySelector(".pl").textContent = soundOn ? "Sound" : "Muted";
-    if (soundOn) sfx.click();
+  }
+  function syncMusicBtn() {
+    $("#music-btn").querySelector(".pi").textContent = musicOn ? "🎵" : "🎵";
+    $("#music-btn").classList.toggle("is-off", !musicOn);
+    $("#music-btn").querySelector(".pl").textContent = musicOn ? "Music" : "Music off";
+  }
+  $("#mute-btn").addEventListener("click", () => {
+    soundOn = !soundOn; save(); syncMuteBtn();
+    if (soundOn) { kickAudio(); sfx.click(); } else { stopMusic(); }
+  });
+  $("#music-btn").addEventListener("click", () => {
+    musicOn = !musicOn; save(); syncMusicBtn();
+    if (musicOn && soundOn) { kickAudio(); sfx.click(); } else { stopMusic(); }
   });
   $("#reset-btn").addEventListener("click", () => askConfirm("Start the whole game over for PJ? (Clears opened doors and votes.)", fullReset));
   $("#confirm-yes").addEventListener("click", () => closeConfirm(true));
@@ -610,9 +708,10 @@
 
   /* ---------- Boot ---------- */
   load();
-  $("#mute-btn").querySelector(".pi").textContent = soundOn ? "🔊" : "🔇";
-  $("#mute-btn").querySelector(".pl").textContent = soundOn ? "Sound" : "Muted";
+  syncMuteBtn(); syncMusicBtn();
   renderDoors();
+  // Start music on the first interaction anywhere (browsers block autoplay until a gesture)
+  document.addEventListener("pointerdown", function once() { document.removeEventListener("pointerdown", once); kickAudio(); }, { once: true });
   if (lockedId) { showScreen("stage"); showFinale(lockedId); }
   else if (opened.size > 0) showScreen("stage");
   else showScreen("intro");
