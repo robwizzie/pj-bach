@@ -26,7 +26,7 @@
   /* ---------- Persistence ---------- */
   const SAVE_KEY = "pj-bach-state";
   function save() {
-    localStorage.setItem(SAVE_KEY, JSON.stringify({ opened: [...opened], lockedId, soundOn, musicOn, votes }));
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ opened: [...opened], lockedId, soundOn, musicOn, announcerOn, votes }));
   }
   function load() {
     try {
@@ -35,6 +35,7 @@
       lockedId = s.lockedId || null;
       if (typeof s.soundOn === "boolean") soundOn = s.soundOn;
       if (typeof s.musicOn === "boolean") musicOn = s.musicOn;
+      if (typeof s.announcerOn === "boolean") announcerOn = s.announcerOn;
       if (s.votes) votes = s.votes;
     } catch (e) {}
   }
@@ -52,7 +53,7 @@
   const costRange = (trip, n) => { if (trip.free) return "FREE"; const c = tripCost(trip, n); return money(c.lo) + " – " + money(c.hi); };
 
   function showScreen(name) {
-    ["intro", "stage", "compare"].forEach((s) => $("#" + s).classList.toggle("hidden", s !== name));
+    ["intro", "stage", "compare", "results"].forEach((s) => $("#" + s).classList.toggle("hidden", s !== name));
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -173,6 +174,21 @@
   }
   function kickAudio() { ensureAudio(); if (actx && actx.state === "suspended") actx.resume(); startMusic(); }
 
+  /* ---------- Announcer (game-show voice via Web Speech) ---------- */
+  let announcerOn = true;
+  const hasTTS = typeof window !== "undefined" && "speechSynthesis" in window;
+  function announce(text, opts) {
+    if (!announcerOn || !soundOn || !hasTTS) return;
+    try {
+      opts = opts || {};
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = opts.rate || 0.95; u.pitch = opts.pitch != null ? opts.pitch : 1.05; u.volume = opts.volume || 1;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function stopAnnounce() { if (hasTTS) { try { speechSynthesis.cancel(); } catch (e) {} } }
+
   /* ---------- Confetti ---------- */
   const canvas = $("#confetti-canvas"), ctx = canvas.getContext("2d");
   let confetti = [];
@@ -260,9 +276,11 @@
 
   function onDoorClick(id, face, door) {
     if (!opened.has(id)) {
+      const trip = tripById(id);
       countdown(() => {
         face.classList.add("open"); door.classList.add("is-open");
         sfx.open(); burst(50); showToast(randCatch());
+        announce("Door " + trip.door + "... " + trip.name + "!");
         setTimeout(() => openModal(id), 350);
       });
     } else { sfx.click(); openModal(id); }
@@ -364,8 +382,46 @@
     showToast("Vote counted for " + tripById(id).name.split(",")[0] + "! 👍");
     renderDoors();
     if (!$("#compare").classList.contains("hidden")) { renderCompareCards(); renderTable(); }
+    if (!$("#results").classList.contains("hidden")) renderResults();
     const mv = $("#modal-vote-count"); if (mv && currentTripId === id) mv.textContent = votes[id];
   }
+
+  /* ---------- Vote results / leaderboard ---------- */
+  function renderResults() {
+    const list = $("#results-list"); list.innerHTML = "";
+    const total = TRIPS.reduce((s, t) => s + (votes[t.id] || 0), 0);
+    if (total === 0) {
+      list.innerHTML = '<div class="no-votes">🗳️ No votes yet!<br><span>Open the doors and tap <b>👍</b> on a trip (on a card, in the table, or inside a trip) to start the tally. Pass the phone around the crew and watch the bars fill up.</span></div>';
+      return;
+    }
+    const ranked = TRIPS.slice().sort((a, b) => (votes[b.id] || 0) - (votes[a.id] || 0));
+    const max = Math.max(1, ...TRIPS.map((t) => votes[t.id] || 0));
+    ranked.forEach((t, i) => {
+      const v = votes[t.id] || 0;
+      const leader = i === 0 && v > 0;
+      const row = document.createElement("div");
+      row.className = "lb-row" + (leader ? " lb-leader" : "");
+      row.style.setProperty("--accent", t.color);
+      row.innerHTML =
+        '<div class="lb-rank">' + (leader ? "👑" : "#" + (i + 1)) + '</div>' +
+        '<div class="lb-main">' +
+          '<div class="lb-name">' + t.emoji + " " + t.name + ' <span class="lb-count">' + v + " vote" + (v === 1 ? "" : "s") + '</span></div>' +
+          '<div class="lb-track"><div class="lb-fill" data-pct="' + Math.round((v / max) * 100) + '"></div></div>' +
+        '</div>' +
+        '<button class="lb-pick" data-id="' + t.id + '">Lock in</button>';
+      row.querySelector(".lb-name").onclick = () => openModal(t.id);
+      row.querySelector(".lb-pick").onclick = () => lockIn(t.id);
+      list.appendChild(row);
+    });
+    const note = document.createElement("p");
+    note.className = "lb-total";
+    note.innerHTML = total + " vote" + (total === 1 ? "" : "s") + " cast • leader: <b>" + ranked[0].name.split(",")[0] + "</b>";
+    list.appendChild(note);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      list.querySelectorAll(".lb-fill").forEach((f) => (f.style.width = f.dataset.pct + "%"));
+    }));
+  }
+  function openResults() { sfx.click(); renderResults(); showScreen("results"); }
 
   /* ---------- Trip modal ---------- */
   function openModal(id) {
@@ -500,6 +556,8 @@
   function lockIn(id) {
     lockedId = id; save(); closeModal(); closeShowdown();
     sfx.win(); burst(260); setTimeout(() => burst(180), 400); setTimeout(() => burst(180), 800);
+    const trip = tripById(id);
+    announce("And it's official! PJ is going to... " + trip.name + "! Let's go!", { rate: 0.9 });
     renderDoors(); showFinale(id);
   }
   function showFinale(id) {
@@ -580,6 +638,7 @@
   }
   function renderChampion() {
     const t = sdChampion; sfx.win(); burst(220);
+    announce("Your champion is... " + t.name + "!", { rate: 0.92 });
     $("#sd-progress").textContent = "👑 Your champion!";
     $("#sd-arena").innerHTML =
       '<div class="sd-winner" style="--accent:' + t.color + '"><div class="sd-emoji">' + t.emoji + '</div>' +
@@ -613,9 +672,16 @@
   }
 
   /* ---------- Controls ---------- */
-  $("#start-btn").addEventListener("click", () => { kickAudio(); sfx.fanfare(); showScreen("stage"); });
+  $("#start-btn").addEventListener("click", () => {
+    kickAudio(); sfx.fanfare();
+    announce("Ladies and gentlemen, welcome to PJ's Bachelor Blowout! Pick a door, PJ!", { rate: 0.95 });
+    showScreen("stage");
+  });
   $("#browse-btn").addEventListener("click", () => { kickAudio(); sfx.click(); renderCompare(); showScreen("compare"); });
   $("#share-btn").addEventListener("click", () => { sfx.click(); share(); });
+  $("#results-btn").addEventListener("click", openResults);
+  $("#results-back").addEventListener("click", () => showScreen("stage"));
+  $("#compare-results").addEventListener("click", openResults);
   $("#home-btn").addEventListener("click", () => { sfx.click(); showScreen("intro"); });
   $("#seeall-btn").addEventListener("click", () => { renderCompare(); showScreen("compare"); });
   $("#stage-seeall").addEventListener("click", () => { renderCompare(); showScreen("compare"); });
@@ -659,13 +725,22 @@
     $("#mute-btn").querySelector(".pl").textContent = soundOn ? "Sound" : "Muted";
   }
   function syncMusicBtn() {
-    $("#music-btn").querySelector(".pi").textContent = musicOn ? "🎵" : "🎵";
     $("#music-btn").classList.toggle("is-off", !musicOn);
     $("#music-btn").querySelector(".pl").textContent = musicOn ? "Music" : "Music off";
   }
+  function syncAnnouncerBtn() {
+    const b = $("#announcer-btn"); if (!b) return;
+    b.classList.toggle("is-off", !announcerOn);
+    b.querySelector(".pl").textContent = announcerOn ? "Voice" : "Voice off";
+  }
+  $("#announcer-btn").addEventListener("click", () => {
+    announcerOn = !announcerOn; save(); syncAnnouncerBtn();
+    if (announcerOn && soundOn) { kickAudio(); announce("Announcer on! Let's play!"); }
+    else stopAnnounce();
+  });
   $("#mute-btn").addEventListener("click", () => {
     soundOn = !soundOn; save(); syncMuteBtn();
-    if (soundOn) { kickAudio(); sfx.click(); } else { stopMusic(); }
+    if (soundOn) { kickAudio(); sfx.click(); } else { stopMusic(); stopAnnounce(); }
   });
   $("#music-btn").addEventListener("click", () => {
     musicOn = !musicOn; save(); syncMusicBtn();
@@ -708,7 +783,7 @@
 
   /* ---------- Boot ---------- */
   load();
-  syncMuteBtn(); syncMusicBtn();
+  syncMuteBtn(); syncMusicBtn(); syncAnnouncerBtn();
   renderDoors();
   // Start music on the first interaction anywhere (browsers block autoplay until a gesture)
   document.addEventListener("pointerdown", function once() { document.removeEventListener("pointerdown", once); kickAudio(); }, { once: true });
